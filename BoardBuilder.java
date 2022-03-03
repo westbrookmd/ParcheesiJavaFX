@@ -19,8 +19,8 @@ public class BoardBuilder extends Application {
 
    //initialize constants used to count total number of spaces (including invisible), as well as the width and height of a single space
    private static final int BOARD_SIZE = 361;
-   private static final int SPACE_WIDTH_MULTIPLE = 14;
-   private static final int SPACE_HEIGHT_MULTIPLE = 20;
+   private static final int SPACE_WIDTH_MULTIPLE = 22;
+   private static final int SPACE_HEIGHT_MULTIPLE = 23;
    private static final float CIRCLE_RADIUS_MULTIPLE = 5.5f;
    
    public void start(Stage primaryStage) {
