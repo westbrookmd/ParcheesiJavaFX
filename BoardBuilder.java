@@ -2,9 +2,12 @@
 //Use this to create the game board
 
 import javafx.application.*;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.*;
 import javafx.scene.paint.*;
@@ -16,8 +19,9 @@ public class BoardBuilder extends Application {
 
    //initialize constants used to count total number of spaces (including invisible), as well as the width and height of a single space
    private static final int BOARD_SIZE = 361;
-   private static final int WIDTH = 50;
-   private static final int HEIGHT = 30;
+   private static final int SPACE_WIDTH_MULTIPLE = 14;
+   private static final int SPACE_HEIGHT_MULTIPLE = 20;
+   private static final float CIRCLE_RADIUS_MULTIPLE = 5.5f;
    
    public void start(Stage primaryStage) {
    
@@ -34,9 +38,10 @@ public class BoardBuilder extends Application {
       
       for(int i = 0; i < start.length; i++){
          start[i] = new Circle();
+         //circle size based on multiple of window size
+         start[i].radiusProperty().bind(Bindings.min(primaryStage.widthProperty().divide(CIRCLE_RADIUS_MULTIPLE), primaryStage.heightProperty().divide(CIRCLE_RADIUS_MULTIPLE)));
          start[i].setStroke(Color.BLACK);
          //start[i].setFill(Color.PINK);
-         start[i].setRadius(125);
          //set the colors of starting spaces to match player colors. later on we'll need to determine extra colors so that pieces can be more easily seen against spaces with matching colors (for example, green pieces at green start)
          switch(i) {
             case 0: start[i].setFill(Color.PURPLE); break;
@@ -48,7 +53,10 @@ public class BoardBuilder extends Application {
       
       //set default color for visible spaces
       for(int i = 0; i < spaces.length; i++){
-         spaces[i] = new Rectangle(0,0, WIDTH, HEIGHT);
+         spaces[i] = new Rectangle();
+         //space size based on multiple of window size
+         spaces[i].widthProperty().bind(primaryStage.widthProperty().divide(SPACE_WIDTH_MULTIPLE));
+         spaces[i].heightProperty().bind(primaryStage.heightProperty().divide(SPACE_HEIGHT_MULTIPLE));
          spaces[i].setStroke(Color.BLACK);
          spaces[i].setFill(Color.BEIGE);
       }
@@ -98,32 +106,15 @@ public class BoardBuilder extends Application {
             col++;
          }
       }
-      
-      //add transparent dividers to board to allow start spaces to be properly added to board, as well as a piece to be added to the center
-      Rectangle vDiv1 = new Rectangle(0, 0, (WIDTH * 3), (HEIGHT * 8.23));
-      Rectangle vDiv2 = new Rectangle(0, 0, (WIDTH * 3), (HEIGHT * 8.23));
-      Rectangle hDiv = new Rectangle(0, 0, (WIDTH * 3), (HEIGHT * 3.07));
-      Rectangle center = new Rectangle(0, 0, (WIDTH * 3), (HEIGHT * 3));
-      
-      vDiv1.setStroke(Color.TRANSPARENT);
-      vDiv1.setFill(Color.TRANSPARENT);
-      vDiv1.setStrokeWidth(5); 
-      
-      vDiv2.setStroke(Color.TRANSPARENT);
-      vDiv2.setFill(Color.TRANSPARENT);
-      vDiv2.setStrokeWidth(5); 
-      
-      hDiv.setStroke(Color.TRANSPARENT);
-      hDiv.setFill(Color.TRANSPARENT);
-      hDiv.setStrokeWidth(5);
-      
+
+      Rectangle center = new Rectangle();
+      //center size based on multiple of window size
+      center.widthProperty().bind(primaryStage.widthProperty().divide(SPACE_WIDTH_MULTIPLE).multiply(3));
+      //center size based on multiple of window size
+      center.heightProperty().bind(primaryStage.heightProperty().divide(SPACE_HEIGHT_MULTIPLE).multiply(3));
       center.setStroke(Color.RED);
       center.setFill(Color.LIGHTBLUE);
       center.setStrokeWidth(5);
-      
-      startSpaces.add(vDiv1, 1, 0);
-      startSpaces.add(hDiv, 0, 1);
-      startSpaces.add(vDiv2, 1, 2);
       startSpaces.add(center, 1, 1);
       
       //add start spaces to board
@@ -133,13 +124,17 @@ public class BoardBuilder extends Application {
       startSpaces.add(start[3], 2, 2);
       
       //add board pieces to stackpane
-      board.getChildren().addAll(cross, startSpaces);
+      //put startspaces before cross so circles don't cover the cross with an odd window size
+      board.getChildren().addAll( startSpaces, cross);
       startSpaces.setAlignment(Pos.CENTER);
       cross.setAlignment(Pos.CENTER);
    
       Scene scene = new Scene(board);
       primaryStage.setTitle("Parcheesi Board");
       primaryStage.setScene(scene);
+      //default stage size since all items are based on window size
+      primaryStage.setWidth(600);
+      primaryStage.setHeight(600);
       primaryStage.show();
    }
 }
