@@ -109,7 +109,7 @@ public class BoardBuilder extends Application {
       vDiv1.setFill(Color.TRANSPARENT);
       vDiv1.setStrokeWidth(5); 
       
-      vDiv2.setStroke(Color.TRANSPARENT);     
+      vDiv2.setStroke(Color.TRANSPARENT);
       vDiv2.setFill(Color.TRANSPARENT);
       vDiv2.setStrokeWidth(5); 
       
@@ -121,19 +121,20 @@ public class BoardBuilder extends Application {
       center.setFill(Color.LIGHTBLUE);
       center.setStrokeWidth(5);
       
-      startSpaces.add(vDiv1, 2, 0);
+      startSpaces.add(vDiv1, 1, 0);
       startSpaces.add(hDiv, 0, 1);
-      startSpaces.add(vDiv2, 1, 2);      
-      startSpaces.add(center, 2, 1);
+      startSpaces.add(vDiv2, 1, 2);
+      startSpaces.add(center, 1, 1);
       
       //add start spaces to board
-      startSpaces.add(start[0], 1, 0);
-      startSpaces.add(start[1], 3, 0);
-      startSpaces.add(start[2], 1, 2);
-      startSpaces.add(start[3], 3, 2);
+      startSpaces.add(start[0], 0, 0);
+      startSpaces.add(start[1], 2, 0);
+      startSpaces.add(start[2], 0, 2);
+      startSpaces.add(start[3], 2, 2);
       
       //add board pieces to stackpane
       board.getChildren().addAll(cross, startSpaces);
+      startSpaces.setAlignment(Pos.CENTER);
       cross.setAlignment(Pos.CENTER);
    
       Scene scene = new Scene(board);
