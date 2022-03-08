@@ -6,32 +6,25 @@ import javafx.application.*;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.*;
 import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.*;
 import javafx.scene.paint.*;
-import javafx.scene.text.Font;
 import javafx.stage.*;
-import javafx.beans.*;
 
 public class BoardBuilder extends Application {
 
    //initialize constants used to count total number of spaces (including invisible), as well as the width and height of a single space
    private static final int BOARD_SIZE = 361;
-   private static final int SPACE_WIDTH_MULTIPLE = 22;
-   private static final int SPACE_HEIGHT_MULTIPLE = 23;
-   private static final float CIRCLE_RADIUS_MULTIPLE = 5.5f;
+   private static final int SPACE_WIDTH_MULTIPLE = 28;
+   private static final int SPACE_HEIGHT_MULTIPLE = 29;
+   private static final float CIRCLE_RADIUS_MULTIPLE = 9.5f;
    
    //create a GridPane object that will be used by the main GUI to display the board; this will prevent oddities that happen from using a StackPane on the GUI 
    public GridPane boardBuilder(Stage primaryStage) {
       //create panes for the boards
       StackPane board = new StackPane();
       GridPane startSpaces = new GridPane();
-      //startSpaces.setPadding(new Insets(10));
       GridPane cross = new GridPane();
-      //cross.setPadding(new Insets(10));
       //cross.setGridLinesVisible(true);
       
       //create and initialize arrays for each space, create separate array to hold only the tiles that are actually seen by the player
@@ -46,10 +39,10 @@ public class BoardBuilder extends Application {
          start[i].setStroke(Color.BLACK);
          //set the colors of starting spaces to match player colors. later on we'll need to determine extra colors so that pieces can be more easily seen against spaces with matching colors (for example, green pieces at green start)
          switch(i) {
-            case 0: start[i].setFill(Color.PURPLE); break;
-            case 1: start[i].setFill(Color.YELLOW); break;
-            case 2: start[i].setFill(Color.ORANGE); break;
-            case 3: start[i].setFill(Color.GREEN); break;
+            case 0: start[i].setFill(Color.rgb(203, 195, 227)); break; //LIGHTPURPLE
+            case 1: start[i].setFill(Color.KHAKI); break;
+            case 2: start[i].setFill(Color.rgb(255,165,0)); break; //LIGHTORANGE
+            case 3: start[i].setFill(Color.PALEGREEN); break;
          }
       }
       
@@ -91,7 +84,7 @@ public class BoardBuilder extends Application {
          //change the colors of center lanes and give them midlane status
          if(col == 9) {
             if(row <= 7) {
-               spaces[i].setFill(Color.PURPLE);
+               spaces[i].setFill(Color.rgb(203, 195, 227));
                spaces[i].isSafe = true;
                if(row != 0) {
                   if(tileNo > 7) {
@@ -120,7 +113,7 @@ public class BoardBuilder extends Application {
          
          if(row == 9) {
             if(col <= 7) {
-               spaces[i].setFill(Color.ORANGE);
+               spaces[i].setFill(Color.rgb(255,165,0));
                spaces[i].isSafe = true;
                if(col != 0) {
                   if(tileNo > 7) {
@@ -189,21 +182,28 @@ public class BoardBuilder extends Application {
       
       GridPane game = new GridPane();
       game.add(board, 0, 0);
-      game.setGridLinesVisible(true); //test code to determine what the full gameboard looks like to the GUI
+      game.setAlignment(Pos.CENTER);
+      //test code to determine what the full gameboard looks like to the GUI
+      //game.setGridLinesVisible(true);
       return game;
+   }
+   
+    //code to move tokens around the board
+   public void moveToken(Pawn token, int start, int destination) {
+      //check to make sure all spaces between start and destination are passable
+      //check to make sure destination is landable
+      //place token on space
    }
    
    public void start(Stage primaryStage) {
       StackPane board = new StackPane(boardBuilder(primaryStage));
-      //board.setMinWidth(480);
-      //board.setMinHeight(360);
       
       Scene scene = new Scene(board);
       primaryStage.setTitle("Parcheesi Board");
       primaryStage.setScene(scene);
       //default stage size since all items are based on window size
-//       primaryStage.setWidth(480);
-//       primaryStage.setHeight(360);
+      primaryStage.setWidth(1280);
+      primaryStage.setHeight(720);
       primaryStage.show();
    }
 }
