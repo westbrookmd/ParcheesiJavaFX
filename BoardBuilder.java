@@ -18,6 +18,7 @@ public class BoardBuilder extends Application {
    private static final int SPACE_WIDTH_MULTIPLE = 28;
    private static final int SPACE_HEIGHT_MULTIPLE = 29;
    private static final float CIRCLE_RADIUS_MULTIPLE = 9.5f;
+   public void start(Stage primaryStage) {
    
    //create a GridPane object that will be used by the main GUI to display the board; this will prevent oddities that happen from using a StackPane on the GUI 
    public GridPane boardBuilder(Stage primaryStage) {
@@ -204,6 +205,7 @@ public class BoardBuilder extends Application {
       //default stage size since all items are based on window size
       primaryStage.setWidth(1280);
       primaryStage.setHeight(720);
+
       primaryStage.show();
    }
 }
