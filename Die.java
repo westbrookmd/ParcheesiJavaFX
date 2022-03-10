@@ -1,4 +1,4 @@
-//Natalie Young
+//Class used to create dice for the game
 
 public class Die {
 	//Data Fields
