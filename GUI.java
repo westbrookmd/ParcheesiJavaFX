@@ -19,11 +19,11 @@ import javafx.beans.*;
 
 public class GUI extends Application {
 	private boolean test = false;
-	private boolean active = false;
+	private boolean showingMovementOptions = false;
 	//integers to contain values of each die
-	private int x = 6;
-	private int y = 6;
-	
+	private int firstDieRoll = 6;
+	private int secondDieRoll = 6;
+	Pawn lastPawnClicked;
 	private Board board;
 
 	public void start(Stage primaryStage) {
@@ -32,13 +32,14 @@ public class GUI extends Application {
 		Die die1 = new Die();
 		Die die2 = new Die();
 		board = new Board();
-		Pawn testToken1 = new Pawn(10, Color.GREEN, Color.PALEGREEN);
-		testToken1.token.setStroke(Color.BLACK);
-		Pawn testToken2 = new Pawn(10, Color.GREEN, Color.PALEGREEN);
-		testToken2.token.setStroke(Color.BLACK);
 
 		//create the game board
 		GridPane game = board.build();
+		//create the players
+		Player player1 = new Player(board.playerTokens[0], board.playerTokens[1], board.playerTokens[2], board.playerTokens[3]);
+		Player player2 = new Player(board.playerTokens[4], board.playerTokens[5], board.playerTokens[6], board.playerTokens[7]);
+		Player player3 = new Player(board.playerTokens[8], board.playerTokens[9], board.playerTokens[10], board.playerTokens[11]);
+		Player player4 = new Player(board.playerTokens[12], board.playerTokens[13], board.playerTokens[14], board.playerTokens[15]);
 		game.setAlignment(Pos.CENTER);
 
 		//create VBox that will hold images of the dice values
@@ -131,25 +132,26 @@ public class GUI extends Application {
 
 		//set up event handlers for buttons
 		roll.setOnMouseClicked(e -> {
-			x = die1.roll();
-			y = die2.roll();
+			// TODO: log this action within an additional settings file
+			firstDieRoll = die1.roll();
+			secondDieRoll = die2.roll();
+
 			
 			for (int i = 0; i < board.gameTiles.length; i++) {
 				board.gameTiles[i].base.setFill(board.gameTiles[i].defFill);
 			}
-			
-			//test placing tokens			
-			if(!test) {
-				board.moveToken(testToken1, 1, 5);
-				test = true;
-			}
-			else
+			// TODO: remove this and add a turn-based system
+			if(!test)
 			{
-				board.moveToken(testToken2, 1, 5);
+				board.moveToken(player1.getPawn1(), 1, 2);
+				board.moveToken(player1.getPawn2(), 1, 3);
+				board.moveToken(player1.getPawn3(), 1, 4);
+				board.moveToken(player1.getPawn4(), 1, 5);
+				test = true;
 			}
 			
 			//set first die image to show result
-			switch(x) {
+			switch(firstDieRoll) {
 			case 1:
 				imageView1.setImage(dieImage1);
 				break;
@@ -171,7 +173,7 @@ public class GUI extends Application {
 			}
 
 			//set second die image to show result
-			switch(y) {
+			switch(secondDieRoll) {
 			case 1:
 				imageView2.setImage(dieImage1);
 				break;
@@ -230,47 +232,83 @@ public class GUI extends Application {
 		public void handle(MouseEvent e) {
 			Tile selectedTile = (Tile) e.getSource();
 			if(!selectedTile.occupied) {
-				if(active) {
-					selectedTile.base.setFill(selectedTile.defFill);
-					active = false;
+				if(showingMovementOptions) {
+					if(selectedTile.base.getFill() == Color.RED) {
+						// A normal movement that doesn't capture another piece
+						// TODO: log this action within an additional settings file
+						board.moveToken(lastPawnClicked, lastPawnClicked.currentSpace, selectedTile.tileNo);
+						ResetBoardAppearance();
+						// TODO: remove roll 'uses'. Calculate which option they selected or should we store this when we draw the movement options
+					}
+					else
+					{
+						// we're showing movement options, we clicked a non-occupied space AND a blank space
+						// we'll reset our board and act like we just clicked on our own pawn again
+						ResetBoardAppearance();
+					}
 				}
+				// we clicked a tile without clicking our pawn first
 				else {
-					selectedTile.base.setFill(Color.RED);
-					active = true;
+					//selectedTile.base.setFill(Color.RED);
 				}
 			}
+			// TODO: add an additional if statement to check to see if this is an opponent and we're showing movement options
 			else if (selectedTile.occupied){
-				showMovable(selectedTile);
+				// storing our clicked pawn so that we can move it later
+				lastPawnClicked = selectedTile.occupier;
+				ShowMovementOptions(selectedTile);
 			}
 		}
 	}
-	
-	public void showMovable(Tile start) {
-		Pawn selectedPawn = start.occupier;
+	/**
+	 * Shows all possible movement options for the given pawn
+	 * within a tile.
+	 * @param tileClicked the tile that contains the pawn.
+	 *
+	 */
+	public void ShowMovementOptions(Tile tileClicked) {
+		Pawn selectedPawn = tileClicked.occupier;
+		// TODO: check if this is our pawn (it should be if it is active)
 		if(selectedPawn.active) {
-			selectedPawn.token.setStroke(Color.BLACK);
-			selectedPawn.active = false;
-			
-			for (int i = 0; i < board.gameTiles.length; i++) {
-				board.gameTiles[i].base.setFill(board.gameTiles[i].defFill);
-			}
+			ResetBoardAppearance();
+			lastPawnClicked = null;
+			showingMovementOptions = false;
 		}
 		else {
 			selectedPawn.token.setStroke(Color.RED);
 			selectedPawn.active = true;
+			showingMovementOptions = true;
 
-			for(int i = start.tileNo; i < board.gameTiles.length; i++) {
-				if((board.gameTiles[i].tileNo == (start.tileNo + x)) || (board.gameTiles[i].tileNo == (start.tileNo + y)) || (board.gameTiles[i].tileNo == (start.tileNo + x + y))) {
+			for(int i = tileClicked.tileNo; i < board.gameTiles.length; i++) {
+				// TODO: Add check for blockade
+				if((board.gameTiles[i].tileNo == (tileClicked.tileNo + firstDieRoll)) || (board.gameTiles[i].tileNo == (tileClicked.tileNo + secondDieRoll)) || (board.gameTiles[i].tileNo == (tileClicked.tileNo + firstDieRoll + secondDieRoll))) {
 					board.gameTiles[i].base.setFill(Color.RED);
+					board.gameTiles[i].active = true;
 				}
 				else {
 					board.gameTiles[i].base.setFill(board.gameTiles[i].defFill);
+					board.gameTiles[i].active = false;
 				}
 			}
 
-			for (int i = 0; i < start.tileNo; i++) {
+			for (int i = 0; i < tileClicked.tileNo; i++) {
 				board.gameTiles[i].base.setFill(board.gameTiles[i].defFill);
 			}
+		}
+	}
+
+	/**
+	 * Returns the board to the initial appearance and resets the appearance
+	 * of the last pawn to be clicked.
+	 */
+	private void ResetBoardAppearance() {
+		for (int i = 0; i < board.gameTiles.length; i++) {
+			board.gameTiles[i].base.setFill(board.gameTiles[i].defFill);
+		}
+		if (lastPawnClicked != null)
+		{
+			lastPawnClicked.token.setStroke(Color.BLACK);
+			lastPawnClicked.active = false;
 		}
 	}
 }

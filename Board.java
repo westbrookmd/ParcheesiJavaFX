@@ -30,7 +30,7 @@ public class Board {
 	private Circle[] start;
 	private Tile[] spaces;
 	protected Tile[] gameTiles;
-	protected Pawn[] playerTokens;
+	public Pawn[] playerTokens;
 
 	public Board() {
 		this.width = 28;
@@ -46,7 +46,7 @@ public class Board {
 	}
 
 	public GridPane build() {
-		
+		// TODO: Pull these from the settings class
 		//create player tokens
 		for(int i = 0; i < playerTokens.length; i++) {
 			if(i < 4) {
@@ -203,7 +203,7 @@ public class Board {
 //				tileNo++;
 //			}
 //		}
-		
+
 		//number the tiles so that they go in chronological order from 1 to 68, looping back to 1. tile 1 will be the top-left tile in the upper arm of the cross
 		Tile currentTile;
 		tileNo = 1;
