@@ -1,6 +1,12 @@
-//GUI Class programmed by Christopher Smith
-//Class will be used to display the main components of the game, including the game board, dice images, and buttons for controlling gameplay
-
+/*GUI Class programmed by Christopher Smith
+ *Class will be used to display the main components of the game, including the game board, dice images, and buttons for controlling gameplay
+ *
+ *TODO: 
+ *	Figure out which class should handle moving tokens around, rewrite code to call method from said class
+ *  Cleanup TileIndicator code if possible
+ *  Rewrite ShowMovementOptions code
+ *  Write a resize method to resize all components of the GUI
+ */
 import javafx.application.*;
 import javafx.beans.binding.Bindings;
 import javafx.event.*;
@@ -18,12 +24,13 @@ import javafx.stage.*;
 import javafx.beans.*;
 
 public class GUI extends Application {
+	//TODO: Cleanup unneeded variables
 	private boolean test = false;
-	private boolean active = false;
+	private boolean showingMovementOptions = false;
 	//integers to contain values of each die
-	private int x = 6;
-	private int y = 6;
-	
+	private int firstDieRoll = 6;
+	private int secondDieRoll = 6;
+	Pawn lastPawnClicked;
 	private Board board;
 
 	public void start(Stage primaryStage) {
@@ -32,18 +39,17 @@ public class GUI extends Application {
 		Die die1 = new Die();
 		Die die2 = new Die();
 		board = new Board();
-		Pawn testToken1 = new Pawn(10, Color.GREEN, Color.PALEGREEN);
-		testToken1.token.setStroke(Color.BLACK);
-		Pawn testToken2 = new Pawn(10, Color.GREEN, Color.PALEGREEN);
-		testToken2.token.setStroke(Color.BLACK);
 
 		//create the game board
 		GridPane game = board.build();
+		
+		//TODO: create the players
+		
 		game.setAlignment(Pos.CENTER);
 
 		//create VBox that will hold images of the dice values
+		//TODO: Have diceWindow resize with the main window
 		VBox diceWindow = new VBox();
-		Label placeholder = new Label("This is where the dice will be displayed to the player");
 		diceWindow.setAlignment(Pos.CENTER);
 		diceWindow.setFillWidth(true);
 		diceWindow.setBackground(new Background(new BackgroundFill(Color.AZURE, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -52,7 +58,7 @@ public class GUI extends Application {
 		diceWindow.setStyle("-fx-border-color: black;"
 				+ "-fx-border-width: 5;");
 
-		//die images
+		//die images; TODO: set dieImages as part of the dice class?
 		Image dieImage1 = new Image("dice1.png"); 
 		Image dieImage2 = new Image("dice2.png");
 		Image dieImage3 = new Image("dice3.png");
@@ -79,12 +85,13 @@ public class GUI extends Application {
 
 		//HBox to hold dice imageViews
 		HBox dice = new HBox(10);
-
 		dice.getChildren().addAll(imageView1, imageView2);
 		dice.setAlignment(Pos.CENTER);
 		diceWindow.getChildren().add(dice);
 
 		//create HBox that will hold user commands
+		//TODO: configure buttonBox to resize with the window, without getting cut off
+		//TODO: have buttons themselves change size to match window
 		HBox buttonBox = new HBox(10);
 		buttonBox.setFillHeight(true);
 		Button roll = new Button("Roll");
@@ -96,13 +103,13 @@ public class GUI extends Application {
 				+ "-fx-border-width: 5;");
 
 		//create menubar which will allow players to exit the game or start a new one 
-		//later on will also include a settings option to allow player to adjust various aspects of the game, including game music/sound effects, and window size
+		//TODO: Create save game option?
 		MenuBar menu = new MenuBar();
 		Menu file = new Menu("File");
 		Menu help = new Menu("Help");
 
 		MenuItem newGame = new MenuItem("New Game");
-		MenuItem settings = new MenuItem("Configure");
+		MenuItem settings = new MenuItem("Configure"); //TODO: Create settings window: will allow players to change window size, game music & sound effects, and possibly other stuff
 		MenuItem exit = new MenuItem("Exit");
 		file.getItems().addAll(newGame, settings, exit);
 
@@ -112,16 +119,21 @@ public class GUI extends Application {
 		menu.getMenus().addAll(file, help);
 		menu.prefWidthProperty().bind(primaryStage.widthProperty());
 
-		//set up event handlers for menu items
+		//TODO: set up event handlers for menu items
 		newGame.setOnAction(e -> {
+			//TODO: set to display the start screen, start brand new game, prompt player to save current game?
 
 		});
 
 		settings.setOnAction(e -> {
+			/* TODO: allow players to adjust window size
+			 * TODO: allow players to adjust volume for music & sound effects
+			 */
 
 		});
 
 		about.setOnAction(e -> {
+			//TODO: set button to display credits
 
 		});
 
@@ -131,25 +143,18 @@ public class GUI extends Application {
 
 		//set up event handlers for buttons
 		roll.setOnMouseClicked(e -> {
-			x = die1.roll();
-			y = die2.roll();
+			// TODO: log this action within an additional settings file
+			firstDieRoll = die1.roll();
+			secondDieRoll = die2.roll();
 			
-			for (int i = 0; i < board.gameTiles.length; i++) {
-				board.gameTiles[i].base.setFill(board.gameTiles[i].defFill);
-			}
-			
-			//test placing tokens			
-			if(!test) {
-				board.moveToken(testToken1, 1, 5);
+			// TODO: remove this and add a turn-based system
+			if(!test)
+			{
 				test = true;
 			}
-			else
-			{
-				board.moveToken(testToken2, 1, 5);
-			}
-			
+
 			//set first die image to show result
-			switch(x) {
+			switch(firstDieRoll) {
 			case 1:
 				imageView1.setImage(dieImage1);
 				break;
@@ -171,7 +176,7 @@ public class GUI extends Application {
 			}
 
 			//set second die image to show result
-			switch(y) {
+			switch(secondDieRoll) {
 			case 1:
 				imageView2.setImage(dieImage1);
 				break;
@@ -194,26 +199,23 @@ public class GUI extends Application {
 		});
 
 		rules.setOnMouseClicked(e -> {
+			//TODO: Display new window for rules page(s)
 
 		});
-		
-		//setup tile click event handlers
-		for(int i = 0; i < board.gameTiles.length; i++) {
-			board.gameTiles[i].setOnMouseClicked(new TileIndicator());
-		}
 
 		//set components inside GUI borderbox
+		//TODO: set something on the left side to center the game board?
 		program.setTop(menu);
-		program.setMargin(menu, new Insets(0, 0, 15, 0));
+		BorderPane.setMargin(menu, new Insets(0, 0, 15, 0));
 
 		program.setRight(diceWindow);
-		program.setMargin(diceWindow, new Insets(5));
+		BorderPane.setMargin(diceWindow, new Insets(5));
 
 		program.setCenter(game);
-		program.setMargin(game, new Insets(25));
+		BorderPane.setMargin(game, new Insets(25));
 
 		program.setBottom(buttonBox);
-		program.setMargin(buttonBox, new Insets(5));
+		BorderPane.setMargin(buttonBox, new Insets(5));
 
 		//need to find a way to ensure minimum size will always leave all components of the program visible, considering having min size be 1280 x 720 but final min size should be able to contain entire GUI while being readable
 
@@ -225,52 +227,29 @@ public class GUI extends Application {
 		primaryStage.setResizable(false);
 		primaryStage.show();
 	}
-	
+
+	//inner class handles mouse events; need to figure out what all it needs to be doing
 	class TileIndicator implements EventHandler<MouseEvent> {
+		//TODO: rewrite the entire class?
 		public void handle(MouseEvent e) {
 			Tile selectedTile = (Tile) e.getSource();
-			if(!selectedTile.occupied) {
-				if(active) {
-					selectedTile.base.setFill(selectedTile.defFill);
-					active = false;
-				}
-				else {
-					selectedTile.base.setFill(Color.RED);
-					active = true;
-				}
-			}
-			else if (selectedTile.occupied){
-				showMovable(selectedTile);
-			}
 		}
 	}
 	
-	public void showMovable(Tile start) {
-		Pawn selectedPawn = start.occupier;
-		if(selectedPawn.active) {
-			selectedPawn.token.setStroke(Color.BLACK);
-			selectedPawn.active = false;
-			
-			for (int i = 0; i < board.gameTiles.length; i++) {
-				board.gameTiles[i].base.setFill(board.gameTiles[i].defFill);
-			}
-		}
-		else {
-			selectedPawn.token.setStroke(Color.RED);
-			selectedPawn.active = true;
-
-			for(int i = start.tileNo; i < board.gameTiles.length; i++) {
-				if((board.gameTiles[i].tileNo == (start.tileNo + x)) || (board.gameTiles[i].tileNo == (start.tileNo + y)) || (board.gameTiles[i].tileNo == (start.tileNo + x + y))) {
-					board.gameTiles[i].base.setFill(Color.RED);
-				}
-				else {
-					board.gameTiles[i].base.setFill(board.gameTiles[i].defFill);
-				}
-			}
-
-			for (int i = 0; i < start.tileNo; i++) {
-				board.gameTiles[i].base.setFill(board.gameTiles[i].defFill);
-			}
-		}
+	/**
+	 * Shows all possible movement options for the given pawn
+	 * within a tile.
+	 * @param tileClicked the tile that contains the pawn.
+	 * TODO: Change @param to look at the pawn itself?
+	 */
+	public void ShowMovementOptions(Tile tileClicked) {
+		//TODO: Move method to Board class, or rewrite method so it relies more on the board class method
+		Pawn selectedPawn = tileClicked.occupier;
 	}
+
+	/**
+	 * Returns the board to the initial appearance and resets the appearance
+	 * of the last pawn to be clicked.
+	 * TODO: Move this method to Board class
+	 */
 }

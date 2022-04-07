@@ -10,30 +10,30 @@ public class Tile extends StackPane {
 	//create variables used by class. separate checks for safe spaces and middle-lane spaces are needed because not all safe spaces are in middle lanes. all mid-lane spaces are safe however
 	private boolean blocked;
 	private int tokenCount;
-	protected Pawn occupier;
-	protected boolean occupied;
+	private int tileNo;
+	private int startFor;
+	private boolean midLane;
+	private boolean isSafe;
 	private GridPane grid;
-	protected Rectangle base;
-	protected int tileNo;
-	protected boolean isMidLane;
-	protected boolean isSafe;
+	
+	protected Pawn occupier;
+	protected boolean occupied;	
+	protected Rectangle base;	
 	protected Color defFill;
-   protected boolean active;
-
-	//variables for testing
-	//private Circle[] testTokens;
+	protected boolean active;
 
 	//default constructor for default spaces
 	public Tile() {
 		this.isSafe = false;
-		this.isMidLane = false;
+		this.midLane = false;
 		this.blocked = false;
 		this.tokenCount = 0;
 		this.tileNo = 0;
+		this.startFor = -1;
 		this.occupier = null;
 		this.defFill = Color.TRANSPARENT;
 		this.occupied = false;
-      this.active = false;
+		this.active = false;
 
 		this.base = new Rectangle();
 		this.base.setFill(defFill);
@@ -41,14 +41,40 @@ public class Tile extends StackPane {
 
 		this.grid = new GridPane();
 		this.getChildren().addAll(base, grid);
-
-		// testTokens = new Circle[2];
-		//     for(int i = 0; i < testTokens.length; i++) {
-		//        testTokens[i] = new Circle();
-		//        testTokens[i].setStroke(Color.BLACK);
-		//        testTokens[i].setFill(Color.BLACK);
-		//        testTokens[i].setRadius(10);
-		//     }
+	}
+	
+	//getter and setter methods
+	
+	public int getTileNo() {
+		return this.tileNo;
+	}
+	
+	public void setTileNo(int num) {
+		this.tileNo = num;
+	}
+	
+	public boolean getMidLane() {
+		return this.midLane;
+	}
+	
+	public void setMidLane(boolean status) {
+		this.midLane = status;
+	}
+	
+	public boolean getIsSafe() {
+		return this.isSafe;
+	}
+	
+	public void setIsSafe(boolean status) {
+		this.isSafe = status;
+	}
+	
+	public int getStartFor() {
+		return this.startFor;
+	}
+	
+	public void setStartFor(int player) {
+		this.startFor = player;
 	}
 
 	//method that will eventually determine whether or not a player can land on this tile
@@ -58,7 +84,9 @@ public class Tile extends StackPane {
              if the space is a safe space, players may pass it freely if it is not blockaded; if the player wishes to land there then there must not be any opposing players currently occupying the space;
              if the space is a mid-lane, it must match the player's color.
 		 */
-		if(this.blocked || (landing && this.isSafe && tokenCount == 1 && token.spaceColor != this.occupier.spaceColor) || (this.isMidLane && this.base.getFill() != token.spaceColor)) {
+		
+		//TODO: Rewrite this method so it only looks to see if the tile is passable. Potentially write new method to check who is currently on the tile when landing
+		if(this.blocked || (landing && this.isSafe && tokenCount == 1 && token.getSpaceColor() != this.occupier.getSpaceColor()) || (this.midLane && this.base.getFill() != token.getSpaceColor())) {
 			return false;
 		}
 
@@ -69,45 +97,17 @@ public class Tile extends StackPane {
 
 	//place tokens on a valid space
 	public void placeToken(Pawn token) {
-		if(this.tokenCount == 0) {
-			this.occupier = token;
-			this.tokenCount = 1;
-			this.occupied = true;
-			this.grid.add(token.token, 1, 0);
+		if(this.occupied) {
+			grid.add(token, 0, 2);
 		}
-		else if(this.occupier.spaceColor != token.spaceColor) {
-			//capture the token
-			this.grid.add(token.token, 1, 0);
-		}
-		else if(this.tokenCount == 1) {
-			this.tokenCount = 2;
-			this.grid.add(token.token, 2, 0);
-			this.block();
-		}
-	}
-
-	//method that will put a blockade on the current space
-	public boolean block() {
-		/*
-    check to see if there are two pieces of the same color currently on the space. if so, set blocked to true. if a blockade is broken, set blocked to true
-    should be run twice when player moves their token; once for the space they land on, and once for the space they're leaving in order to break the blockade
-		 */
-		if(this.tokenCount < 2){
-			this.blocked = true;
-		}
-
 		else {
-			this.blocked = false;
+			grid.add(token, 0, 1);
 		}
-
-		return this.blocked;
 	}
-	
+
 	//method to remove tokens from tiles
-	public void removeToken() {
-		if(this.tokenCount > 0) {
-			grid.getChildren().removeAll();
-		}
+	public void removeToken(Pawn token) {
+		grid.getChildren().remove(token);
 	}
 
 	//code to test numbering board spaces   
@@ -123,5 +123,10 @@ public class Tile extends StackPane {
 
 	public void setStroke(Color color){
 		this.base.setStroke(color);
+	}
+	
+	public void resizeTile(int width, int height) {
+		this.base.setWidth(width);
+		this.base.setHeight(height);
 	}
 }
