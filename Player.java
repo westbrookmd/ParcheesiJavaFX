@@ -1,35 +1,34 @@
-
+import javafx.scene.paint.Color;
 
 public class Player {
+	//initialize array of tokens for each player
+	private Pawn[] pawns;
+	private Color color;
+	
+	//@param token indicates token color, @param space indicates color of starting space and accessible midlane
+	public Player(Color token, Color space)
+	{	
+		pawns = new Pawn[4];
+		for(int i = 0; i < pawns.length; i++) {
+			pawns[i] = new Pawn(i, 10, token, space);
+		}
+		color = space;
+	}
+	
+	public Color getColor() {
+		return this.color;
+	}
 
-    private final Pawn _pawn1;
-    private final Pawn _pawn2;
-    private Pawn _pawn3;
-    private Pawn _pawn4;
+	//allow program to grab individual tokens; @param to indicate which token should be moved
+	//TODO: Error checking
+	public Pawn getToken(int token) {
+		return pawns[token];
+	}
 
-    public Player(Pawn pawn1, Pawn pawn2, Pawn pawn3, Pawn pawn4)
-    {
-        _pawn1 = pawn1;
-        _pawn2 = pawn2;
-        _pawn3 = pawn3;
-        _pawn4 = pawn4;
-    }
-    public Pawn getPawn1()
-    {
-        return _pawn1;
-    }
-    public Pawn getPawn2()
-    {
-        return _pawn2;
-    }
-    public Pawn getPawn3()
-    {
-        return _pawn3;
-    }
-    public Pawn getPawn4()
-    {
-        return _pawn4;
-    }
-
-
+	//TODO: Implement method that allows player to move their tokens around based on dice roll
+	public void moveToken(int token, Tile start, Tile dest) {
+		Pawn selected = this.getToken(token);
+		start.removeToken(selected);
+		dest.placeToken(selected);
+	}
 }
