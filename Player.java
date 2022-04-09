@@ -4,15 +4,17 @@ public class Player {
 	//initialize array of tokens for each player
 	private Pawn[] pawns;
 	private Color color;
+	private int lastGameTileNumberBeforePersonalRoute;
 	
 	//@param token indicates token color, @param space indicates color of starting space and accessible midlane
-	public Player(Color token, Color space)
+	public Player(Color token, Color space, int lastGameTileNumberBeforePersonalRoute)
 	{	
 		pawns = new Pawn[4];
 		for(int i = 0; i < pawns.length; i++) {
 			pawns[i] = new Pawn(i, 10, token, space);
 		}
 		color = space;
+		this.lastGameTileNumberBeforePersonalRoute = lastGameTileNumberBeforePersonalRoute;
 	}
 	
 	public Color getColor() {
@@ -23,6 +25,11 @@ public class Player {
 	//TODO: Error checking
 	public Pawn getToken(int token) {
 		return pawns[token];
+	}
+
+	public int getLastGameTileNum()
+	{
+		return lastGameTileNumberBeforePersonalRoute;
 	}
 
 	//TODO: Implement method that allows player to move their tokens around based on dice roll

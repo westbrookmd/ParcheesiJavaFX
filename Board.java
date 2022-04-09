@@ -64,10 +64,10 @@ public class Board {
 		//create player tokens
 		//TODO: setup gameplay so that players go counter-clockwise.
 		//TODO: take input from start screen and apply it here
-		players[0] = new Player(PURPLE, LIGHTPURPLE);
-		players[1] = new Player(ORANGE, LIGHTORANGE);
-		players[2] = new Player(GREEN, PALEGREEN);
-		players[3] = new Player(YELLOW, KHAKI);
+		players[0] = new Player(PURPLE, LIGHTPURPLE, 68);
+		players[1] = new Player(ORANGE, LIGHTORANGE, 17);
+		players[2] = new Player(GREEN, PALEGREEN, 34);
+		players[3] = new Player(YELLOW, KHAKI, 51);
 
 		//create starting spaces
 		for(int i = 0; i < start.length; i++){
@@ -447,53 +447,64 @@ public class Board {
 
 	//display spaces the selected token may move to
 	public void displayMoves(Player player, int pawn, int roll1, int roll2) {
+		// set all variables to reduce complexity within the method
 		Pawn clickedPawn = player.getToken(pawn);
+		int currentLocation = clickedPawn.getLocation();
+		int lastGameTileNum = player.getLastGameTileNum();
+		boolean firstRollSendsToPersonalRoute = false;
+		boolean secondRollSendsToPersonalRoute = false;
+		boolean combinedRollSendsToPersonalRoute = false;
 		//TODO: figure out how to code this method so it displays valid spaces the player may move to
 		//TODO: Add check for blockade
 		//TODO: Call board refresh method
 
-		//TODO: Add LastGameTileNum (or something more descriptive) to the Player class to reduce complexity
-		int player0LastGameTileNum = 68;
-		int player1LastGameTileNum = 17;
-		int player2LastGameTileNum = 34;
-		int player3LastGameTileNum = 51;
-
 		//Naive calculation for location and then check if we overshoot our personal route
-		int firstRollLocation = (clickedPawn.getLocation()  + roll1);
-		boolean firstRollSendsToPersonalRoute;
-		if (clickedPawn.getLocation() + firstRollLocation > player0LastGameTileNum)
-		{
+		int firstRollLocation = (currentLocation  + roll1);
+		if (currentLocation + firstRollLocation > lastGameTileNum) {
 			firstRollSendsToPersonalRoute = true;
 			//calculates what location should be highlighted on the individual player's route (colored tiles)
-			firstRollLocation = (clickedPawn.getLocation() + firstRollLocation) - player0LastGameTileNum;
+			firstRollLocation = (currentLocation + firstRollLocation) - lastGameTileNum;
 		}
 
-		int secondRollLocation = (clickedPawn.getLocation() + roll2);
-		boolean secondRollSendsToPersonalRoute;
-		if (clickedPawn.getLocation() + secondRollLocation > player0LastGameTileNum)
-		{
+		int secondRollLocation = (currentLocation + roll2);
+		if (currentLocation + secondRollLocation > lastGameTileNum) {
 			secondRollSendsToPersonalRoute = true;
-			secondRollLocation = (clickedPawn.getLocation() + secondRollLocation) - player0LastGameTileNum;
+			secondRollLocation = (currentLocation + secondRollLocation) - lastGameTileNum;
 		}
-		int combinedRollLocation = (clickedPawn.getLocation() + roll1 + roll2);
-		boolean combinedRollSendsToPersonalRoute;
-		if (clickedPawn.getLocation() + combinedRollLocation > player0LastGameTileNum)
-		{
+
+		int combinedRollLocation = (currentLocation + roll1 + roll2);
+		if (currentLocation + combinedRollLocation > lastGameTileNum) {
 			combinedRollSendsToPersonalRoute = true;
-			combinedRollLocation = (clickedPawn.getLocation() + combinedRollLocation) - player0LastGameTileNum;
+			combinedRollLocation = (currentLocation + combinedRollLocation) - lastGameTileNum;
 		}
-		
-		//TODO: Use roll location boolean values
-		// and LastGameTileNum to determine whether we are coloring a game tile or a personal route
-		gameTiles[firstRollLocation].base.setFill(Color.RED);
-		gameTiles[firstRollLocation].active = true;
-		gameTiles[secondRollLocation].base.setFill(Color.RED);
-		gameTiles[secondRollLocation].active = true;
-		gameTiles[combinedRollLocation].base.setFill(Color.RED);
-		gameTiles[combinedRollLocation].active = true;
+
+		// Tile coloring logic (gametile or personal route)
+		if (firstRollSendsToPersonalRoute) {
+			//set personal route tile's color and active property
+		}
+		else {
+			gameTiles[firstRollLocation].base.setFill(Color.RED);
+			gameTiles[firstRollLocation].active = true;
+		}
+		if (secondRollSendsToPersonalRoute) {
+			//set personal route tile's color and active property
+		}
+		else {
+			gameTiles[secondRollLocation].base.setFill(Color.RED);
+			gameTiles[secondRollLocation].active = true;
+		}
+
+		if (combinedRollSendsToPersonalRoute) {
+			//set personal route tile's color and active property
+		}
+		else {
+			gameTiles[combinedRollLocation].base.setFill(Color.RED);
+			gameTiles[combinedRollLocation].active = true;
+		}
 		//the trickiest part will be figuring out how to loop from space 68 to space 1
 		//determine how to display when the player can enter their mid-lanes
 		//determine how to display when play can enter HOME
 		//determine how to check if player is at start. If so, check to see if player can leave start.
+		// TODO: store the values of the valid gameTiles moves into a global array/list and the valid personalroute moves into a separate array/list
 		}
 	}
