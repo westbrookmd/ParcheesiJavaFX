@@ -10,6 +10,7 @@ public class Pawn extends Circle {
 	private int tokenNo;
 	private int location;
 	protected boolean active;
+	protected boolean inMidlane = false;
 
 	/* token constructor; spaceColor is to indicate which spaces on the board match the tokens; spaceColors match to tokenColors in the following way:
     tokenColor  : spaceColor

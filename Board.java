@@ -64,10 +64,10 @@ public class Board {
 		//create player tokens
 		//TODO: setup gameplay so that players go counter-clockwise.
 		//TODO: take input from start screen and apply it here
-		players[0] = new Player(PURPLE, LIGHTPURPLE, 68);
-		players[1] = new Player(ORANGE, LIGHTORANGE, 17);
-		players[2] = new Player(GREEN, PALEGREEN, 34);
-		players[3] = new Player(YELLOW, KHAKI, 51);
+		players[0] = new Player(PURPLE, LIGHTPURPLE, 68, 69);
+		players[1] = new Player(ORANGE, LIGHTORANGE, 17, 76);
+		players[2] = new Player(GREEN, PALEGREEN, 34, 90);
+		players[3] = new Player(YELLOW, KHAKI, 51, 83);
 
 		//create starting spaces
 		for(int i = 0; i < start.length; i++){
@@ -451,51 +451,58 @@ public class Board {
 		Pawn clickedPawn = player.getToken(pawn);
 		int currentLocation = clickedPawn.getLocation();
 		int lastGameTileNum = player.getLastGameTileNum();
-		boolean firstRollSendsToPersonalRoute = false;
-		boolean secondRollSendsToPersonalRoute = false;
-		boolean combinedRollSendsToPersonalRoute = false;
+		int midlaneTileStartNum = player.getMidlaneStartTile();
+		boolean firstRollSendsToMidlane = false;
+		boolean secondRollSendsToMidlane = false;
+		boolean combinedRollSendsToMidlane = false;
 		//TODO: figure out how to code this method so it displays valid spaces the player may move to
 		//TODO: Add check for blockade
 		//TODO: Call board refresh method
 
-		//Naive calculation for location and then check if we overshoot our personal route
+		//Naive calculation for location and then check if we overshoot our midlane
 		int firstRollLocation = (currentLocation  + roll1);
 		if (currentLocation + firstRollLocation > lastGameTileNum) {
-			firstRollSendsToPersonalRoute = true;
-			//calculates what location should be highlighted on the individual player's route (colored tiles)
-			firstRollLocation = (currentLocation + firstRollLocation) - lastGameTileNum;
+			firstRollSendsToMidlane = true;
+			//calculates what location should be highlighted on the individual player's midlane (colored tiles)
+			firstRollLocation = (currentLocation + firstRollLocation) - lastGameTileNum + midlaneTileStartNum;
 		}
 
 		int secondRollLocation = (currentLocation + roll2);
 		if (currentLocation + secondRollLocation > lastGameTileNum) {
-			secondRollSendsToPersonalRoute = true;
-			secondRollLocation = (currentLocation + secondRollLocation) - lastGameTileNum;
+			secondRollSendsToMidlane = true;
+			secondRollLocation = (currentLocation + secondRollLocation) - lastGameTileNum + midlaneTileStartNum;
 		}
 
 		int combinedRollLocation = (currentLocation + roll1 + roll2);
 		if (currentLocation + combinedRollLocation > lastGameTileNum) {
-			combinedRollSendsToPersonalRoute = true;
-			combinedRollLocation = (currentLocation + combinedRollLocation) - lastGameTileNum;
+			combinedRollSendsToMidlane = true;
+			combinedRollLocation = (currentLocation + combinedRollLocation) - lastGameTileNum + midlaneTileStartNum;
 		}
 
-		// Tile coloring logic (gametile or personal route)
-		if (firstRollSendsToPersonalRoute) {
-			//set personal route tile's color and active property
+		// Tile coloring logic (gametile or midlane)
+		if (firstRollSendsToMidlane) {
+			//set midlane tile's color and active property
+			midLanes[firstRollLocation].base.setFill(Color.RED);
+			midLanes[firstRollLocation].active = true;
 		}
 		else {
 			gameTiles[firstRollLocation].base.setFill(Color.RED);
 			gameTiles[firstRollLocation].active = true;
 		}
-		if (secondRollSendsToPersonalRoute) {
-			//set personal route tile's color and active property
+		if (secondRollSendsToMidlane) {
+			//set midlane tile's color and active property
+			midLanes[secondRollLocation].base.setFill(Color.RED);
+			midLanes[secondRollLocation].active = true;
 		}
 		else {
 			gameTiles[secondRollLocation].base.setFill(Color.RED);
 			gameTiles[secondRollLocation].active = true;
 		}
 
-		if (combinedRollSendsToPersonalRoute) {
-			//set personal route tile's color and active property
+		if (combinedRollSendsToMidlane) {
+			//set midlane tile's color and active property
+			midLanes[combinedRollLocation].base.setFill(Color.RED);
+			midLanes[combinedRollLocation].active = true;
 		}
 		else {
 			gameTiles[combinedRollLocation].base.setFill(Color.RED);
@@ -505,6 +512,6 @@ public class Board {
 		//determine how to display when the player can enter their mid-lanes
 		//determine how to display when play can enter HOME
 		//determine how to check if player is at start. If so, check to see if player can leave start.
-		// TODO: store the values of the valid gameTiles moves into a global array/list and the valid personalroute moves into a separate array/list
+		// TODO: store the values of the valid gameTiles moves into a global array/list and the valid midlane moves into a separate array/list
 		}
 	}
