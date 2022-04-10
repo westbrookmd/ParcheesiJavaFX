@@ -1,5 +1,4 @@
-/*GUI Class programmed by Christopher Smith
- *Class will be used to display the main components of the game, including the game board, dice images, and buttons for controlling gameplay
+/*Class will be used to display the main components of the game, including the game board, dice images, and buttons for controlling gameplay
  *
  *TODO: 
  *	Figure out which class should handle moving tokens around, rewrite code to call method from said class
@@ -28,8 +27,8 @@ public class GUI extends Application {
 	private boolean test = false;
 	private boolean showingMovementOptions = false;
 	//integers to contain values of each die
-	private int firstDieRoll = 6;
-	private int secondDieRoll = 6;
+	private int firstDieRoll = 5;
+	private int secondDieRoll = 5;
 	Pawn lastPawnClicked;
 	private Board board;
 
@@ -58,16 +57,8 @@ public class GUI extends Application {
 		diceWindow.setStyle("-fx-border-color: black;"
 				+ "-fx-border-width: 5;");
 
-		//die images; TODO: set dieImages as part of the dice class?
-		Image dieImage1 = new Image("dice1.png"); 
-		Image dieImage2 = new Image("dice2.png");
-		Image dieImage3 = new Image("dice3.png");
-		Image dieImage4 = new Image("dice4.png");
-		Image dieImage5 = new Image("dice5.png");
-      Image dieImage6 = new Image("dice6.png");
-
 		//Setting the image view 1 
-		ImageView imageView1 = new ImageView(dieImage6);
+		ImageView imageView1 = new ImageView(die1.showDie());
 		//setting the fit height and width of the image view 
 		imageView1.setFitHeight(100); 
 		imageView1.setFitWidth(100);         
@@ -76,7 +67,7 @@ public class GUI extends Application {
 
 
 		//Setting the image view 2 
-		ImageView imageView2 = new ImageView(dieImage6);
+		ImageView imageView2 = new ImageView(die2.showDie());
 		//setting the fit height and width of the image view 
 		imageView2.setFitHeight(100); 
 		imageView2.setFitWidth(100);          
@@ -146,6 +137,8 @@ public class GUI extends Application {
 			// TODO: log this action within an additional settings file
 			firstDieRoll = die1.roll();
 			secondDieRoll = die2.roll();
+			imageView1.setImage(die1.showDie());
+			imageView2.setImage(die2.showDie());
 			
 			// TODO: remove this and add a turn-based system
 			if(!test)
@@ -154,48 +147,7 @@ public class GUI extends Application {
 			}
 
 			//set first die image to show result
-			switch(firstDieRoll) {
-			case 1:
-				imageView1.setImage(dieImage1);
-				break;
-			case 2:
-				imageView1.setImage(dieImage2);
-				break;
-			case 3:
-				imageView1.setImage(dieImage3);
-				break;
-			case 4:
-				imageView1.setImage(dieImage4);
-				break;
-			case 5:
-				imageView1.setImage(dieImage5);
-				break;
-			case 6:
-				imageView1.setImage(dieImage6);
-				break;
-			}
-
-			//set second die image to show result
-			switch(secondDieRoll) {
-			case 1:
-				imageView2.setImage(dieImage1);
-				break;
-			case 2:
-				imageView2.setImage(dieImage2);
-				break;
-			case 3:
-				imageView2.setImage(dieImage3);
-				break;
-			case 4:
-				imageView2.setImage(dieImage4);
-				break;
-			case 5:
-				imageView2.setImage(dieImage5);
-				break;
-			case 6:
-				imageView2.setImage(dieImage6);
-				break;
-			}
+			
 		});
 
 		rules.setOnMouseClicked(e -> {
@@ -222,8 +174,9 @@ public class GUI extends Application {
 		Scene scene = new Scene(program);
 		primaryStage.setTitle("Parcheesi Board");
 		primaryStage.setScene(scene);
-		primaryStage.setWidth(1280);
-		primaryStage.setHeight(720);
+      //for some odd reason, running this in Eclipse allows the UI to display without cutting anything off, yet in jGrasp elements still get cut off, despite code in both otherwise being identical
+//		primaryStage.setWidth(1280);
+//		primaryStage.setHeight(720);
 		primaryStage.setResizable(false);
 		primaryStage.show();
 	}

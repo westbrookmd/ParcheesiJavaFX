@@ -26,6 +26,14 @@ public class Pawn extends Circle {
 		this.location = -1;
 		this.active = false;
 	}
+	
+	public int getTokenNo() {
+		return this.tokenNo;
+	}
+	
+	public Color getTokenColor() {
+		return this.tokenColor;
+	}
 
 	public Color getSpaceColor() {
 		return spaceColor;

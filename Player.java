@@ -2,17 +2,23 @@ import javafx.scene.paint.Color;
 
 public class Player {
 	//initialize array of tokens for each player
-	private Pawn[] pawns;
+	protected Pawn[] pawns;
 	private Color color;
+	private int lastTile;
 	
 	//@param token indicates token color, @param space indicates color of starting space and accessible midlane
-	public Player(Color token, Color space)
+	public Player(int tile, Color token, Color space)
 	{	
 		pawns = new Pawn[4];
 		for(int i = 0; i < pawns.length; i++) {
 			pawns[i] = new Pawn(i, 10, token, space);
 		}
-		color = space;
+		this.color = space;
+		this.lastTile = tile;
+	}
+	
+	public int getLastTile() {
+		return this.lastTile;
 	}
 	
 	public Color getColor() {
