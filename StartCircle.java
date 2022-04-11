@@ -7,7 +7,7 @@ import javafx.scene.shape.Circle;
 
 public class StartCircle extends StackPane {
 	private Circle base;
-	private ArrayList<Pawn> pawns;
+	public ArrayList<Pawn> pawns;
 	private Circle[] tokens;
 	private StackPane pane;
 

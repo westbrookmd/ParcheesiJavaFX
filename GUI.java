@@ -7,20 +7,15 @@
  *  Write a resize method to resize all components of the GUI
  */
 import javafx.application.*;
-import javafx.beans.binding.Bindings;
 import javafx.event.*;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.shape.*;
 import javafx.scene.paint.*;
-import javafx.scene.text.Font;
 import javafx.stage.*;
-import javafx.beans.*;
 
 public class GUI extends Application {
 	//TODO: Cleanup unneeded variables
@@ -29,8 +24,11 @@ public class GUI extends Application {
 	//integers to contain values of each die
 	private int firstDieRoll = 5;
 	private int secondDieRoll = 5;
-	Pawn lastPawnClicked;
 	private Board board;
+
+	private boolean hasRolled;
+	private int currentPlayer;
+
 
 	public void start(Stage primaryStage) {
 		//create Borderpane to hold all components of GUI
@@ -134,20 +132,27 @@ public class GUI extends Application {
 
 		//set up event handlers for buttons
 		roll.setOnMouseClicked(e -> {
+			if (currentPlayer == 4)
+			{
+				currentPlayer = 0;
+			}
 			// TODO: log this action within an additional settings file
 			firstDieRoll = die1.roll();
+			board.firstDieRoll = firstDieRoll;
 			secondDieRoll = die2.roll();
+			board.secondDieRoll = secondDieRoll;
 			imageView1.setImage(die1.showDie());
 			imageView2.setImage(die2.showDie());
 			
 			// TODO: remove this and add a turn-based system
-			if(!test)
-			{
-				test = true;
-			}
-
+			hasRolled = true;
+			board.currentPlayerTurn = currentPlayer;
+			//roll.setDisable(true);
+			// TODO: where do we check the rolls and do that logic?
+			// triggers displaymoves() or gets a pawn on the board
+			board.rollUpdate();
 			//set first die image to show result
-			
+			currentPlayer += 1;
 		});
 
 		rules.setOnMouseClicked(e -> {
