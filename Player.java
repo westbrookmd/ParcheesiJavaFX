@@ -2,7 +2,7 @@ import javafx.scene.paint.Color;
 
 public class Player {
 	//initialize array of tokens for each player
-	private Pawn[] pawns;
+	protected Pawn[] pawns;
 	private Color color;
 	private int lastGameTileNumberBeforeMidlane;
 	private int midlaneStartTile;
@@ -16,7 +16,10 @@ public class Player {
 		}
 		color = space;
 		this.lastGameTileNumberBeforeMidlane = lastGameTileNumberBeforeMidlane;
+		this.color = space;
 	}
+	
+
 	
 	public Color getColor() {
 		return this.color;

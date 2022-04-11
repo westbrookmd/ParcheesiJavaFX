@@ -14,8 +14,8 @@ public class Board {
 	//colors used in the game for player tokens, starting/midlane spaces, and safe spaces
 	private static final Color PURPLE = Color.PURPLE;
 	private static final Color LIGHTPURPLE = Color.rgb(203, 195, 227);
-	private static final Color ORANGE = Color.ORANGE;
-	private static final Color LIGHTORANGE = Color.rgb(255,165,0);
+	private static final Color DARKORANGE = Color.DARKORANGE;
+	private static final Color LIGHTORANGE = Color.rgb(255,179,138);
 	private static final Color GREEN = Color.GREEN;
 	private static final Color PALEGREEN = Color.PALEGREEN;
 	private static final Color YELLOW = Color.YELLOW;
@@ -29,14 +29,14 @@ public class Board {
 
 	//create panes for the board
 	private StackPane board;
-	private GridPane startSpaces;
+	private GridPane startLayer;
 	private GridPane cross;
 	private GridPane game;
 
 	//create and initialize arrays for each space and for player tokens
 	//create separate array to hold only the tiles that are actually seen by the player
 	//create special array for midlane tiles to make it easier to sort them out later on
-	private Circle[] start;
+	private StartCircle[] startSpaces;
 	private Tile[] spaces;
 	private Tile[] midLanes;
 	protected Tile[] gameTiles;
@@ -48,10 +48,10 @@ public class Board {
 		this.height = 25;
 		this.radius = 100f;
 		this.board = new StackPane();
-		this.startSpaces = new GridPane();
+		this.startLayer = new GridPane();
 		this.cross = new GridPane();
 		this.game = new GridPane();
-		this.start = new Circle[4];
+		this.startSpaces = new StartCircle[4];
 		this.spaces = new Tile[BOARD_SIZE];
 		this.gameTiles = new Tile[CROSS_SIZE];
 		this.midLanes = new Tile[28];
@@ -59,71 +59,41 @@ public class Board {
 	}
 
 	//build the game board, including creating the main shape of the board, setting start spaces, and setting tokens on board
+	//first-time setup when starting the game
 	public GridPane build() {
 
 		//create player tokens
 		//TODO: setup gameplay so that players go counter-clockwise.
 		//TODO: take input from start screen and apply it here
-		players[0] = new Player(PURPLE, LIGHTPURPLE, 68, 69);
-		players[1] = new Player(ORANGE, LIGHTORANGE, 17, 76);
-		players[2] = new Player(GREEN, PALEGREEN, 34, 90);
-		players[3] = new Player(YELLOW, KHAKI, 51, 83);
-
-		//create starting spaces
-		for(int i = 0; i < start.length; i++){
-			start[i] = new Circle();
-			start[i].setStroke(Color.BLACK);
-			//set the colors of starting spaces to match player colors.
-			//TODO: rewrite this so it makes sense, move code to its own method
-			switch(i) {
-			case 0: start[i].setFill(players[0].getColor());
-			break;
-			case 1: start[i].setFill(players[3].getColor());
-			break;
-			case 2: start[i].setFill(players[1].getColor());
-			break;
-			case 3: start[i].setFill(players[2].getColor());
-			break;
-			}
-		}
+		//TODO: when doing the above, make sure to set start-circles and mid-lanes so they match the player
+		players[0] = new Player(68, PURPLE, LIGHTPURPLE);
+		players[1] = new Player(17, DARKORANGE, LIGHTORANGE);
+		players[2] = new Player(34, GREEN, PALEGREEN);
+		players[3] = new Player(51, YELLOW, KHAKI);
 
 		//create all tiles used for the game
 		for(int i = 0; i < spaces.length; i++){
 			spaces[i] = new Tile();
 		}
 
-		//first-time setup stuff
-		resizeBoard(width, height, radius);
-		buildCross(cross);	
+		drawStartSpaces(startLayer);
+		drawCross(cross);
+		//drawHome();
 		setTiles();
+		resizeBoard(width, height, radius);
 
 		//test code for checking tile numbering system
 		for(int i = 0; i < gameTiles.length; i++) {
 			gameTiles[i].testTileCount();
 		}
 
-		//draw the home space of the board
-		//TODO: create new method for this
-		Rectangle center = new Rectangle();
-		//center size based on multiple of window size
-		center.setWidth(this.width * 3);
-		//center size based on multiple of window size
-		center.setHeight(this.height * 3);
-		center.setStroke(Color.RED);
-		center.setFill(Color.LIGHTBLUE);
-		center.setStrokeWidth(5);
+		//add home space to board
+		startLayer.add(drawHome(), 1, 1);
 
-		//add start spaces and home space to board
-		startSpaces.add(center, 1, 1);
-		startSpaces.add(start[0], 0, 0);
-		startSpaces.add(start[1], 2, 0);
-		startSpaces.add(start[2], 0, 2);
-		startSpaces.add(start[3], 2, 2);
-
-		//add board pieces to stackpane
-		//put start spaces before cross so circles don't cover the cross with an odd window size
-		board.getChildren().addAll(startSpaces, cross);
-		startSpaces.setAlignment(Pos.CENTER);
+		//combine all the board pieces together
+		//put startLayer before cross so circles don't cover the cross with an odd window size
+		board.getChildren().addAll(startLayer, cross);
+		startLayer.setAlignment(Pos.CENTER);
 		cross.setAlignment(Pos.CENTER);
 
 		game.add(board, 0, 0);
@@ -144,7 +114,8 @@ public class Board {
 	}
 
 	//create the cross-shaped part of the board that players will play on
-	private GridPane buildCross(GridPane cross) {
+
+	private GridPane drawCross(GridPane cross) {
 		int col = 0;
 		int row = 0;
 		int tileCount = 0;
@@ -184,6 +155,7 @@ public class Board {
 	}
 
 	//set the tileNo for all tiles, give midlane and safe status to tiles that need it
+
 	private void setTiles() {
 		Tile currentTile;
 		int tileNo = 69;
@@ -378,15 +350,82 @@ public class Board {
 	}
 
 	//TODO: draw the Home space	
-	private void buildHome() {
-		//TODO: flesh out method
-		//Home space should take up entire center portion of board, the point where each arm of the cross meets
-		//Should have diagonal dividers to split Home into four sections: one for each arm of the cross
-		//Each section should be able to hold four tokens
+
+	private Rectangle drawHome() {
+		//TODO: Flesh out method; maybe create new class?
+		//draw the home space of the board
+		Rectangle center = new Rectangle();
+		//center size based on multiple of window size
+		center.setWidth(this.width * 3);
+		//center size based on multiple of window size
+		center.setHeight(this.height * 3);
+		center.setStroke(Color.RED);
+		center.setFill(Color.LIGHTBLUE);
+		center.setStrokeWidth(5);
+		
+		return center;
 	}
 
-	//TODO: draw the starting spaces
-	private void drawStart() {
+	private void drawStartSpaces(GridPane startLayer) {
+		//create starting spaces
+		for(int i = 0; i < startSpaces.length; i++){
+			startSpaces[i] = new StartCircle();
+			startSpaces[i].setStroke(Color.BLACK);
+			//set the colors of starting spaces to match player colors.
+			switch(i) {
+			case 0: startSpaces[i].setFill(players[0].getColor());
+			break;
+			case 1: startSpaces[i].setFill(players[3].getColor());
+			break;
+			case 2: startSpaces[i].setFill(players[1].getColor());
+			break;
+			case 3: startSpaces[i].setFill(players[2].getColor());
+			break;
+			}
+		}
+
+		startLayer.add(startSpaces[0].drawStart(), 0, 0);
+		startLayer.add(startSpaces[1].drawStart(), 2, 0);
+		startLayer.add(startSpaces[2].drawStart(), 0, 2);
+		startLayer.add(startSpaces[3].drawStart(), 2, 2);
+
+		//setup pawn circle positions inside of starting circles. as game progresses, it will show/hide circles representing the pawns as the pawns enter/leave the starting circle
+		for(int i = 0; i < startSpaces.length; i++) {
+			startSpaces[i].drawBase();
+			switch(i) {
+			case 0: 
+				for(int j = 0; j < players[i].pawns.length; j++) {
+					startSpaces[i].setupPawn(players[0].pawns[j]);
+					startSpaces[i].addPawn(players[0].pawns[j]);
+				}
+				break;
+			case 1:
+				for(int j = 0; j < players[i].pawns.length; j++) {
+					startSpaces[i].setupPawn(players[3].pawns[j]);
+					startSpaces[i].addPawn(players[3].pawns[j]);
+				}
+				break;
+			case 2:
+				for(int j = 0; j < players[i].pawns.length; j++) {
+					startSpaces[i].setupPawn(players[1].pawns[j]);
+					startSpaces[i].addPawn(players[1].pawns[j]);
+				}
+				break;
+			case 3:
+				for(int j = 0; j < players[i].pawns.length; j++) {
+					startSpaces[i].setupPawn(players[2].pawns[j]);
+					startSpaces[i].addPawn(players[2].pawns[j]);
+				}
+				break;
+			}
+		}
+
+		//test code for hiding pawns
+		//		for(int i = 0; i < players.length; i++) {
+		//			startSpaces[i].hidePawn(players[i].pawns[i].getTokenNo());
+		//		}
+		//
+		//		startSpaces[0].removePawn(players[0].pawns[2]);
 
 	}
 
@@ -398,8 +437,8 @@ public class Board {
 		}
 
 		//resize start spaces
-		for(int i = 0; i < start.length; i++) {
-			start[i].setRadius(radius);
+		for(int i = 0; i < startSpaces.length; i++) {
+			startSpaces[i].setRadius(radius);
 		}
 
 		//resize pawns
@@ -424,7 +463,6 @@ public class Board {
 			}
 			else {
 				//check to see if the destination is occupied
-				//use index dest - 1 since array starts at index 0
 				if(gameTiles[dest - 1].occupied) {
 					//check to see who is occupying the destination tile
 					if(gameTiles[dest - 1].occupier.getSpaceColor() == token.getSpaceColor()) {
