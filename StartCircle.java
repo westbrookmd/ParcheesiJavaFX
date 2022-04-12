@@ -70,7 +70,7 @@ public class StartCircle extends StackPane {
 	public void removePawn(Pawn token) {
 		int pawn = pawns.indexOf(token);
 		pawns.remove(token);
-		hidePawn(pawn);
+		//hidePawn(pawn);
 	}
 
 	//hide the pawn once it leaves start
@@ -83,7 +83,7 @@ public class StartCircle extends StackPane {
 	//position pawns inside base circle
 	public void positionPawn(int x, Circle token) {
 		tokens[x] = token;
-		if(x == 0) {
+		/*if(x == 0) {
 			token.setTranslateX(-this.base.getScaleX()*25);
 			token.setTranslateY(-this.base.getScaleY()*25);
 		}
@@ -98,7 +98,7 @@ public class StartCircle extends StackPane {
 		else {
 			token.setTranslateX(+this.base.getScaleX()*25);
 			token.setTranslateY(+this.base.getScaleY()*25);
-		}
+		}*/
 	}
 	
 	//resize pawns inside start circle

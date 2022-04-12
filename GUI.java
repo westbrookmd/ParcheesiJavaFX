@@ -132,27 +132,26 @@ public class GUI extends Application {
 
 		//set up event handlers for buttons
 		roll.setOnMouseClicked(e -> {
+			hasRolled = true;
+			board.currentPlayerTurn = currentPlayer;
+			//roll.setDisable(true);
+
+			// TODO: log this action within an additional settings file
+			firstDieRoll = die1.roll();
+			board.firstDieRoll = firstDieRoll + 1;
+			secondDieRoll = die2.roll();
+			board.secondDieRoll = secondDieRoll + 1;
+			imageView1.setImage(die1.showDie());
+			imageView2.setImage(die2.showDie());
+
+			// TODO: where do we check the rolls and do that logic?
+			board.rollUpdate();
+			//set first die image to show result
+			currentPlayer += 1;
 			if (currentPlayer == 4)
 			{
 				currentPlayer = 0;
 			}
-			// TODO: log this action within an additional settings file
-			firstDieRoll = die1.roll();
-			board.firstDieRoll = firstDieRoll;
-			secondDieRoll = die2.roll();
-			board.secondDieRoll = secondDieRoll;
-			imageView1.setImage(die1.showDie());
-			imageView2.setImage(die2.showDie());
-			
-			// TODO: remove this and add a turn-based system
-			hasRolled = true;
-			board.currentPlayerTurn = currentPlayer;
-			//roll.setDisable(true);
-			// TODO: where do we check the rolls and do that logic?
-			// triggers displaymoves() or gets a pawn on the board
-			board.rollUpdate();
-			//set first die image to show result
-			currentPlayer += 1;
 		});
 
 		rules.setOnMouseClicked(e -> {

@@ -98,11 +98,14 @@ public class Tile extends StackPane {
 	//place tokens on a valid space
 	public void placeToken(Pawn token) {
 		if(this.occupied) {
-			grid.add(token, 0, 2);
+			grid.add(token.token, 0, 0);
 		}
 		else {
-			grid.add(token, 0, 1);
+			grid.add(token.token, 1, 0);
 		}
+		this.occupied = true;
+		occupier = token;
+		token.inStartingArea = false;
 	}
 
 	//method to remove tokens from tiles
