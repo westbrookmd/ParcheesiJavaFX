@@ -1,3 +1,5 @@
+package application;
+
 import java.util.ArrayList;
 
 import javafx.scene.layout.Pane;
@@ -7,7 +9,7 @@ import javafx.scene.shape.Circle;
 
 public class StartCircle extends StackPane {
 	private Circle base;
-	private ArrayList<Pawn> pawns;
+	public ArrayList<Pawn> pawns;
 	private Circle[] tokens;
 	private StackPane pane;
 
@@ -47,10 +49,16 @@ public class StartCircle extends StackPane {
 
 	//first-time setup for start circles; draw each pawn and position them inside circle
 	public void setupPawn(Pawn pawn) {
-		Circle token = pawn.token;
+		Circle token = new Circle(10);
 		positionPawn(pawn.getTokenNo(), token);
-		this.showPawn(pawn);
+		this.drawPawn(token, pawn.getTokenColor());
 		pane.getChildren().add(token);
+	}
+	
+	//initial setup for pawns, draw them then hide/reveal as needed
+	private void drawPawn(Circle pawn, Color color) {
+		pawn.setStroke(Color.BLACK);
+		pawn.setFill(color);
 	}
 
 	//add a pawn to start space
@@ -69,8 +77,9 @@ public class StartCircle extends StackPane {
 	//remove a pawn from start
 	public void removePawn(Pawn token) {
 		int pawn = pawns.indexOf(token);
-		pawns.remove(token);
-		hidePawn(pawn);
+		this.hidePawn(pawn);
+		this.pawns.remove(token);
+		//hidePawn(pawn);
 	}
 
 	//hide the pawn once it leaves start
