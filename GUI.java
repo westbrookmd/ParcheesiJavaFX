@@ -133,7 +133,9 @@ public class GUI extends Application {
 		//set up event handlers for buttons
 		roll.setOnMouseClicked(e -> {
 			hasRolled = true;
+			System.out.println("Current Player: " + currentPlayer);
 			board.currentPlayerTurn = currentPlayer;
+
 			//roll.setDisable(true);
 
 			// TODO: log this action within an additional settings file
@@ -148,6 +150,7 @@ public class GUI extends Application {
 			board.rollUpdate();
 			//set first die image to show result
 			currentPlayer += 1;
+
 			if (currentPlayer == 4)
 			{
 				currentPlayer = 0;

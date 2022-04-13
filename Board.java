@@ -6,6 +6,7 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.*;
 import javafx.scene.paint.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -482,15 +483,16 @@ public class Board {
 			System.out.println("PawnInStartingArea: " + pawnInStartingArea.inStartingArea);
 			System.out.println("First Roll: " + firstDieRoll);
 			System.out.println("Second Roll: " + secondDieRoll);
-			if (firstDieRoll == 4)
+			if (firstDieRoll == 5)
 			{
 				//move a token from home onto board
-				System.out.println("Pawn Location: " + pawnInStartingArea.getLocation());
+
 				System.out.println("Pawn Destination: " + currentPlayer.getStartingTile());
 				moveToken(pawnInStartingArea, currentPlayer.getStartingTile());
+				System.out.println("Pawn Location: " + pawnInStartingArea.getLocation());
 				firstDieRoll = 0;
 			}
-			else if (secondDieRoll == 4)
+			else if (secondDieRoll == 5)
 			{
 				//move a token from home onto board
 				System.out.println("Pawn Location: " + pawnInStartingArea.getLocation());
@@ -521,15 +523,16 @@ public class Board {
 					 System.out.println("Real Player: " + i);
 				 }
 			}
-			gameTiles[dest - 1].placeToken(token);
+			gameTiles[dest - 1].placeToken(token); //might be the problem
 			gameTiles[dest - 1].occupier = token;
-			token.setLocation(dest - 1);
+			token.setLocation(dest);
 			ResetBoardAppearance();
 		}
 		//token is not at start currently
 		else {
 			gameTiles[token.getLocation()].removeToken(token);
 			gameTiles[token.getLocation()].occupied = false;
+			gameTiles[token.getLocation()].occupier = null;
 			//determine if token is going back to start or not
 			if(dest == -1) {
 				//send token to starting circle
@@ -549,20 +552,46 @@ public class Board {
 						token.setLocation(dest - 1);
 						gameTiles[dest - 1].occupied = true;
 						gameTiles[dest - 1].occupier = token;
+						if(gameTiles[dest - 1].getRollValue() != 0)
+						{
+							takeAwayDieUse(gameTiles[dest - 1]);
+						}
 						ResetBoardAppearance();
 					}
 				}
 				else {
+					//figure out how to remove the roll
 					gameTiles[dest - 1].placeToken(token);
-					token.setLocation(dest - 1);
 					gameTiles[dest - 1].occupied = true;
 					gameTiles[dest - 1].occupier = token;
+					if(gameTiles[dest - 1].getRollValue() != 0)
+					{
+						takeAwayDieUse(gameTiles[dest - 1]);
+					}
 					ResetBoardAppearance();
 				}
 			}
 		}
 		//TODO: place tokens in starting spaces
 	}
+
+	private void takeAwayDieUse(Tile destinationTile) {
+		int rollValue = destinationTile.getRollValue();
+		if(rollValue == 1)
+		{
+			firstDieRoll = 0;
+		}
+		else if(rollValue == 2)
+		{
+			secondDieRoll = 0;
+		}
+		else if(rollValue == 3)
+		{
+			firstDieRoll = 0;
+			secondDieRoll = 0;
+		}
+	}
+
 	class TileIndicator implements EventHandler<MouseEvent> {
 		public void handle(MouseEvent e) {
 			System.out.println("Clicked");
@@ -572,7 +601,12 @@ public class Board {
 					if(selectedTile.base.getFill() == Color.RED) {
 						// A normal movement that doesn't capture another piece
 						// TODO: log this action within an additional settings file
-						moveToken(lastPawnClicked, selectedTile.getTileNo());
+						if(selectedTile.getRollValue() != 0)
+						{
+							moveToken(lastPawnClicked, selectedTile.getTileNo());
+							takeAwayDieUse(selectedTile);
+						}
+
 						//ResetBoardAppearance();
 						// TODO: remove roll 'uses'. Calculate which option they selected or should we store this when we draw the movement options
 					}
@@ -594,7 +628,12 @@ public class Board {
 				System.out.println("Occupied");
 				// storing our clicked pawn so that we can move it later
 				lastPawnClicked = selectedTile.occupier;
-				displayMoves(currentPlayer, selectedTile.occupier.getTokenNo(), firstDieRoll, secondDieRoll);
+				// Make sure it's our same colored pawn
+				if(selectedTile.occupier.getTokenColor() == currentPlayer.getToken(0).getTokenColor())
+				{
+					displayMoves(currentPlayer, selectedTile.occupier.getTokenNo(), firstDieRoll, secondDieRoll);
+				}
+
 			}
 		}
 	}
@@ -604,6 +643,7 @@ public class Board {
 		for(Tile t : gameTiles)
 		{
 			t.setFill(t.defFill);
+			t.setRollValue(0);
 		}
 		displayingMoves = false;
 	}
@@ -612,6 +652,7 @@ public class Board {
 	public void displayMoves(Player player, int pawn, int roll1, int roll2) {
 		// set all variables to reduce complexity within the method
 		ResetBoardAppearance();
+
 		displayingMoves = true;
 		lastPawnClicked = player.getToken(pawn);
 		Pawn clickedPawn = player.getToken(pawn);
@@ -629,6 +670,13 @@ public class Board {
 		if(roll1 != 0)
 		{
 			int firstRollLocation = (currentLocation  + roll1);
+			if(currentPlayerTurn != 0)
+			{
+				if(firstRollLocation > 68)
+				{
+					firstRollLocation = firstRollLocation - 68;
+				}
+			}
 			if (currentLocation + firstRollLocation > lastGameTileNum && currentLocation < lastGameTileNum - 12) {
 				firstRollSendsToMidlane = true;
 				//calculates what location should be highlighted on the individual player's midlane (colored tiles)
@@ -636,48 +684,68 @@ public class Board {
 			}
 			if (firstRollSendsToMidlane) {
 				//set midlane tile's color and active property
-				gameTiles[firstRollLocation].base.setFill(Color.RED);
-				gameTiles[firstRollLocation].active = true;
+				gameTiles[firstRollLocation - 1].base.setFill(Color.RED);
+				gameTiles[firstRollLocation - 1].active = true;
+				gameTiles[firstRollLocation - 1].setRollValue(1);
 			}
 			else {
-				gameTiles[firstRollLocation].base.setFill(Color.RED);
-				gameTiles[firstRollLocation].active = true;
+				gameTiles[firstRollLocation - 1].base.setFill(Color.RED);
+				gameTiles[firstRollLocation - 1].active = true;
+				gameTiles[firstRollLocation - 1].setRollValue(1);
 			}
 		}
 
 		if(roll2 != 0)
 		{
 			int secondRollLocation = (currentLocation + roll2);
+			if(currentPlayerTurn != 0)
+			{
+				if(secondRollLocation > 68)
+				{
+					secondRollLocation = secondRollLocation - 68;
+				}
+			}
 			if (currentLocation + secondRollLocation > lastGameTileNum && currentLocation < lastGameTileNum - 12) {
 				secondRollSendsToMidlane = true;
 				secondRollLocation = (currentLocation + secondRollLocation) - lastGameTileNum + midlaneTileStartNum;
 			}
 			if (secondRollSendsToMidlane) {
 				//set midlane tile's color and active property
-				gameTiles[secondRollLocation].base.setFill(Color.RED);
-				gameTiles[secondRollLocation].active = true;
+				gameTiles[secondRollLocation - 1].base.setFill(Color.RED);
+				gameTiles[secondRollLocation - 1].active = true;
+				gameTiles[secondRollLocation - 1].setRollValue(2);
 			}
 			else {
-				gameTiles[secondRollLocation].base.setFill(Color.RED);
-				gameTiles[secondRollLocation].active = true;
+				gameTiles[secondRollLocation - 1].base.setFill(Color.RED);
+				gameTiles[secondRollLocation - 1].active = true;
+				gameTiles[secondRollLocation - 1].setRollValue(2);
 			}
 		}
 
 		if(!(roll1 == 0 || roll2 == 0))
 		{
 			int combinedRollLocation = (currentLocation + roll1 + roll2);
+			if(currentPlayerTurn != 0)
+			{
+				if(combinedRollLocation > 68)
+				{
+					combinedRollLocation = combinedRollLocation - 68;
+				}
+			}
 			if (currentLocation + combinedRollLocation > lastGameTileNum && currentLocation < lastGameTileNum - 12) {
 				combinedRollSendsToMidlane = true;
 				combinedRollLocation = (currentLocation + combinedRollLocation) - lastGameTileNum + midlaneTileStartNum;
 			}
 			if (combinedRollSendsToMidlane) {
 				//set midlane tile's color and active property
-				gameTiles[combinedRollLocation].base.setFill(Color.RED);
-				gameTiles[combinedRollLocation].active = true;
+				gameTiles[combinedRollLocation - 1].base.setFill(Color.RED);
+				gameTiles[combinedRollLocation - 1].active = true;
+				gameTiles[combinedRollLocation - 1].setRollValue(3);
 			}
 			else {
-				gameTiles[combinedRollLocation].base.setFill(Color.RED);
-				gameTiles[combinedRollLocation].active = true;
+				gameTiles[combinedRollLocation - 1].base.setFill(Color.RED);
+				gameTiles[combinedRollLocation - 1].active = true;
+				gameTiles[combinedRollLocation - 1].setRollValue(3);
 			}
 		}
 
@@ -692,5 +760,6 @@ public class Board {
 		//determine how to display when play can enter HOME
 		//determine how to check if player is at start. If so, check to see if player can leave start.
 		// TODO: store the values of the valid gameTiles moves into a global array/list and the valid midlane moves into a separate array/list
-		}
+	}
+
 	}
