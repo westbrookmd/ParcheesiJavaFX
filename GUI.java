@@ -52,7 +52,7 @@ public class GUI extends Application {
 		Die die2 = new Die();
 		board = new Board();
 		whoseTurn = new Label("");
-		//buzzer = new AudioClip(getClass().getResource("/application/diceroll.wav").toExternalForm());
+		buzzer = new AudioClip(getClass().getResource("/application/diceroll.wav").toExternalForm());
 
 		// create the game board
 		GridPane game = board.build();
@@ -160,7 +160,7 @@ public class GUI extends Application {
 
 		// set up event handlers for buttons
 		roll.setOnMouseClicked(e -> {
-			//buzzer.play();
+			buzzer.play();
 
 			hasRolled = true;
 			System.out.println("Current Player: " + currentPlayer);
