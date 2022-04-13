@@ -7,20 +7,24 @@
  *  Write a resize method to resize all components of the GUI
  */
 import javafx.application.*;
-import javafx.beans.binding.Bindings;
 import javafx.event.*;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.shape.*;
 import javafx.scene.paint.*;
-import javafx.scene.text.Font;
 import javafx.stage.*;
-import javafx.beans.*;
+
+//natalie's added imports for sound
+//package application;  
+import java.io.File;
+import javafx.scene.Group;
+import javafx.scene.media.AudioClip;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 
 public class GUI extends Application {
 	//TODO: Cleanup unneeded variables
@@ -29,8 +33,17 @@ public class GUI extends Application {
 	//integers to contain values of each die
 	private int firstDieRoll = 5;
 	private int secondDieRoll = 5;
-	Pawn lastPawnClicked;
 	private Board board;
+
+	private boolean hasRolled;
+	private int currentPlayer;
+	private Label whoseTurn;
+	private AudioClip buzzer;
+	
+//	public static void main(String[] args) {
+//		launch(args);
+//	}
+
 
 	public void start(Stage primaryStage) {
 		//create Borderpane to hold all components of GUI
@@ -38,13 +51,19 @@ public class GUI extends Application {
 		Die die1 = new Die();
 		Die die2 = new Die();
 		board = new Board();
+		whoseTurn = new Label("");
+		buzzer = new AudioClip(getClass().getResource("/application/diceroll.wav").toExternalForm());
 
 		//create the game board
 		GridPane game = board.build();
-		
+
 		//TODO: create the players
-		
+
 		game.setAlignment(Pos.CENTER);
+		
+		//create Vbox to hold media player
+		//TODO: create the music box
+		//VBox musicBox = new VBox();
 
 		//create VBox that will hold images of the dice values
 		//TODO: Have diceWindow resize with the main window
@@ -52,7 +71,9 @@ public class GUI extends Application {
 		diceWindow.setAlignment(Pos.CENTER);
 		diceWindow.setFillWidth(true);
 		diceWindow.setBackground(new Background(new BackgroundFill(Color.AZURE, CornerRadii.EMPTY, Insets.EMPTY)));
-		diceWindow.getChildren().add(new Label("This is where the dice will be displayed to the player"));
+		//diceWindow.getChildren().add(new Label("This is where the dice will be displayed to the player"));
+		showCurrentPlayer();
+		diceWindow.getChildren().add(whoseTurn);
 		//test code added to determine total size of vbox
 		diceWindow.setStyle("-fx-border-color: black;"
 				+ "-fx-border-width: 5;");
@@ -133,21 +154,34 @@ public class GUI extends Application {
 		});
 
 		//set up event handlers for buttons
-		roll.setOnMouseClicked(e -> {
-			// TODO: log this action within an additional settings file
-			firstDieRoll = die1.roll();
-			secondDieRoll = die2.roll();
-			imageView1.setImage(die1.showDie());
-			imageView2.setImage(die2.showDie());
-			
-			// TODO: remove this and add a turn-based system
-			if(!test)
-			{
-				test = true;
-			}
 
-			//set first die image to show result
+		//Audio for Button Roll
+		
+		roll.setOnMouseClicked(e -> {
+			buzzer.play();
 			
+//			hasRolled = true;
+//			board.currentPlayerTurn = currentPlayer;
+//			//roll.setDisable(true);
+//
+//			// TODO: log this action within an additional settings file
+//			firstDieRoll = die1.roll();
+//			board.firstDieRoll = firstDieRoll + 1;
+//			secondDieRoll = die2.roll();
+//			board.secondDieRoll = secondDieRoll + 1;
+//			imageView1.setImage(die1.showDie());
+//			imageView2.setImage(die2.showDie());
+//
+//			// TODO: where do we check the rolls and do that logic?
+//			// TODO: use a list to track doubles, clear the list at start of each turn, check size of list to determine if penalty applies
+//			board.rollUpdate();
+//			//set first die image to show result
+//			currentPlayer += 1;
+//			if (currentPlayer == 4)
+//			{
+//				currentPlayer = 0;
+//			}
+//			showCurrentPlayer();
 		});
 
 		rules.setOnMouseClicked(e -> {
@@ -174,9 +208,9 @@ public class GUI extends Application {
 		Scene scene = new Scene(program);
 		primaryStage.setTitle("Parcheesi Board");
 		primaryStage.setScene(scene);
-      //for some odd reason, running this in Eclipse allows the UI to display without cutting anything off, yet in jGrasp elements still get cut off, despite code in both otherwise being identical
-//		primaryStage.setWidth(1280);
-//		primaryStage.setHeight(720);
+		//for some odd reason, running this in Eclipse allows the UI to display without cutting anything off, yet in jGrasp elements still get cut off, despite code in both otherwise being identical
+		//		primaryStage.setWidth(1280);
+		//		primaryStage.setHeight(720);
 		primaryStage.setResizable(false);
 		primaryStage.show();
 	}
@@ -188,7 +222,7 @@ public class GUI extends Application {
 			Tile selectedTile = (Tile) e.getSource();
 		}
 	}
-	
+
 	/**
 	 * Shows all possible movement options for the given pawn
 	 * within a tile.
@@ -198,6 +232,11 @@ public class GUI extends Application {
 	public void ShowMovementOptions(Tile tileClicked) {
 		//TODO: Move method to Board class, or rewrite method so it relies more on the board class method
 		Pawn selectedPawn = tileClicked.occupier;
+	}
+	
+	public void showCurrentPlayer() {
+		String message = "It is Player " + (this.currentPlayer + 1) + "'s turn.";
+		whoseTurn.setText(message);
 	}
 
 	/**
