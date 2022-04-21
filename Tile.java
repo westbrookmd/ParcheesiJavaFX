@@ -21,6 +21,7 @@ public class Tile extends StackPane {
 	protected Rectangle base;	
 	protected Color defFill;
 	protected boolean active;
+	private int rollValue;
 
 	//default constructor for default spaces
 	public Tile() {
@@ -34,6 +35,7 @@ public class Tile extends StackPane {
 		this.defFill = Color.TRANSPARENT;
 		this.occupied = false;
 		this.active = false;
+		this.rollValue = 0;
 
 		this.base = new Rectangle();
 		this.base.setFill(defFill);
@@ -60,6 +62,8 @@ public class Tile extends StackPane {
 	public void setMidLane(boolean status) {
 		this.midLane = status;
 	}
+	public void setRollValue(int value) { this.rollValue = value; }
+	public int getRollValue() { return this.rollValue; }
 	
 	public boolean getIsSafe() {
 		return this.isSafe;
@@ -98,11 +102,15 @@ public class Tile extends StackPane {
 	//place tokens on a valid space
 	public void placeToken(Pawn token) {
 		if(this.occupied) {
-			grid.add(token, 0, 2);
+			grid.add(token.token, 0, 0);
 		}
 		else {
-			grid.add(token, 0, 1);
+			grid.add(token.token, 1, 0);
 		}
+		token.setLocation(this.tileNo);
+		this.occupied = true;
+		occupier = token;
+		token.inStartingArea = false;
 	}
 
 	//method to remove tokens from tiles
