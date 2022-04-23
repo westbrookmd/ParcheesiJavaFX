@@ -18,8 +18,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.*;
 import javafx.stage.*;
 
-//natalie's added imports for sound
-//package application;  
 import java.io.File;
 import javafx.scene.Group;
 import javafx.scene.media.AudioClip;
@@ -41,9 +39,6 @@ public class GUI extends Application {
 	private Label whoseTurn;
 	private AudioClip buzzer;
 
-	// public static void main(String[] args) {
-	// launch(args);
-	// }
 
 	public void start(Stage primaryStage) {
 		// create Borderpane to hold all components of GUI
@@ -162,9 +157,9 @@ public class GUI extends Application {
 		roll.setOnMouseClicked(e -> {
 			buzzer.play();
 
-			hasRolled = true;
+
 			System.out.println("Current Player: " + currentPlayer);
-			board.currentPlayerTurn = currentPlayer;
+
 
 			// roll.setDisable(true);
 
@@ -177,14 +172,19 @@ public class GUI extends Application {
 			imageView2.setImage(die2.showDie());
 
 			// TODO: where do we check the rolls and do that logic?
-			board.rollUpdate();
-			// set first die image to show result
-			currentPlayer += 1;
 
+			// set first die image to show result
+			if(hasRolled)
+			{
+				currentPlayer += 1;
+			}
+			hasRolled = true;
 			if (currentPlayer == 4) {
 				currentPlayer = 0;
 			}
 			showCurrentPlayer();
+			board.currentPlayerTurn = currentPlayer;
+			board.rollUpdate();
 		});
 
 		rules.setOnMouseClicked(e -> {
@@ -241,7 +241,7 @@ public class GUI extends Application {
 	public void ShowMovementOptions(Tile tileClicked) {
 		// TODO: Move method to Board class, or rewrite method so it relies more on the
 		// board class method
-		Pawn selectedPawn = tileClicked.occupier;
+		Pawn selectedPawn = tileClicked.occupier.get(0);
 	}
 
 	public void showCurrentPlayer() {
