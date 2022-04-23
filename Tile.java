@@ -6,6 +6,8 @@ import javafx.scene.shape.*;
 import javafx.scene.paint.*;
 import javafx.scene.text.*;
 
+import java.util.ArrayList;
+
 public class Tile extends StackPane {
 	//create variables used by class. separate checks for safe spaces and middle-lane spaces are needed because not all safe spaces are in middle lanes. all mid-lane spaces are safe however
 	private boolean blocked;
@@ -16,7 +18,7 @@ public class Tile extends StackPane {
 	private boolean isSafe;
 	private GridPane grid;
 	
-	protected Pawn occupier;
+	protected ArrayList<Pawn> occupier;
 	protected boolean occupied;	
 	protected Rectangle base;	
 	protected Color defFill;
@@ -36,6 +38,7 @@ public class Tile extends StackPane {
 		this.occupied = false;
 		this.active = false;
 		this.rollValue = 0;
+		this.occupier = new ArrayList<Pawn>();
 
 		this.base = new Rectangle();
 		this.base.setFill(defFill);
@@ -90,7 +93,7 @@ public class Tile extends StackPane {
 		 */
 		
 		//TODO: Rewrite this method so it only looks to see if the tile is passable. Potentially write new method to check who is currently on the tile when landing
-		if(this.blocked || (landing && this.isSafe && tokenCount == 1 && token.getSpaceColor() != this.occupier.getSpaceColor()) || (this.midLane && this.base.getFill() != token.getSpaceColor())) {
+		if(this.blocked || (landing && this.isSafe && tokenCount == 1 && token.getSpaceColor() != this.occupier.get(0).getSpaceColor()) || (this.midLane && this.base.getFill() != token.getSpaceColor())) {
 			return false;
 		}
 
@@ -109,13 +112,18 @@ public class Tile extends StackPane {
 		}
 		token.setLocation(this.tileNo);
 		this.occupied = true;
-		occupier = token;
+		this.occupier.add(token);
 		token.inStartingArea = false;
 	}
 
 	//method to remove tokens from tiles
 	public void removeToken(Pawn token) {
 		grid.getChildren().remove(token);
+		this.occupier.remove(token);
+		if(occupier.size() == 0)
+		{
+			occupied = false;
+		}
 	}
 
 	//code to test numbering board spaces   
