@@ -390,15 +390,19 @@ public class Board {
 			switch (i) {
 				case 0:
 					startSpaces[i].setFill(players[0].getColor());
+					startSpaces[i].setColor(players[0].getColor());
 					break;
 				case 1:
 					startSpaces[i].setFill(players[3].getColor());
+					startSpaces[i].setColor(players[3].getColor());
 					break;
 				case 2:
 					startSpaces[i].setFill(players[1].getColor());
+					startSpaces[i].setColor(players[1].getColor());
 					break;
 				case 3:
 					startSpaces[i].setFill(players[2].getColor());
+					startSpaces[i].setColor(players[2].getColor());
 					break;
 			}
 		}
@@ -469,6 +473,7 @@ public class Board {
 
 	public void rollUpdate()
 	{
+		ResetBoardAppearance();
 		currentPlayer = players[currentPlayerTurn];
 		Pawn pawnInStartingArea = null;
 		if (Arrays.stream(currentPlayer.pawns).anyMatch(pawn -> pawn.inStartingArea))
@@ -512,7 +517,8 @@ public class Board {
 	//@param token indicates which token must be moved, dest represents tileNo for destination tile
 	public void moveToken(Pawn token, int dest) {
 		//token is currently at starting circle
-		if(token.getLocation() == -1) {
+		int currentLocation = token.getLocation();
+		if(currentLocation == -1) {
 			//remove token from starting circle
 			System.out.println("Playerturn Set to: " + currentPlayerTurn);
 			for (int i = 0; i < players.length;i++)
@@ -524,34 +530,45 @@ public class Board {
 				 }
 			}
 			gameTiles[dest - 1].placeToken(token); //might be the problem
-			gameTiles[dest - 1].occupier = token;
-			token.setLocation(dest);
 			ResetBoardAppearance();
 		}
 		//token is not at start currently
 		else {
-			gameTiles[token.getLocation()].removeToken(token);
-			gameTiles[token.getLocation()].occupied = false;
-			gameTiles[token.getLocation()].occupier = null;
+			gameTiles[currentLocation - 1].removeToken(token);
 			//determine if token is going back to start or not
 			if(dest == -1) {
-				//send token to starting circle
+				//TODO:send token to starting circle
+
+				for (StartCircle sc : startSpaces)
+				{
+					System.out.println("SC: " + sc.getColor().toString() + " Token: " + token.getSpaceColor().toString());
+					if(sc.getColor() == token.getSpaceColor())
+					{
+						sc.addPawn(token);
+					}
+				}
 			}
 			else {
-				//check to see if the destination is occupied
 				if(gameTiles[dest - 1].occupied) {
 					//check to see who is occupying the destination tile
-					if(gameTiles[dest - 1].occupier.getSpaceColor() == token.getSpaceColor()) {
+					if(gameTiles[dest - 1].occupier.get(0).getSpaceColor() == token.getSpaceColor()) {
 						//create blockade
+						gameTiles[dest - 1].placeToken(token);
+						if(gameTiles[dest - 1].getRollValue() != 0)
+						{
+							takeAwayDieUse(gameTiles[dest - 1]);
+						}
 					}
 					else {
 						//the token occupying the space does not belong to the player, send the current occupier back to start
 						//TODO: check needs to be done to make sure the tile isn't a safe space which prevents capturing, should probably be done in moveIndicator() method
 						//moveToken(gameTiles[dest - 1].occupier, -1);
+
+						//sending the other player's token to their starting space
+						moveToken(gameTiles[dest - 1].occupier.get(0),-1);
+
+						//Moving current player's token there
 						gameTiles[dest - 1].placeToken(token);
-						token.setLocation(dest - 1);
-						gameTiles[dest - 1].occupied = true;
-						gameTiles[dest - 1].occupier = token;
 						if(gameTiles[dest - 1].getRollValue() != 0)
 						{
 							takeAwayDieUse(gameTiles[dest - 1]);
@@ -560,10 +577,7 @@ public class Board {
 					}
 				}
 				else {
-					//figure out how to remove the roll
 					gameTiles[dest - 1].placeToken(token);
-					gameTiles[dest - 1].occupied = true;
-					gameTiles[dest - 1].occupier = token;
 					if(gameTiles[dest - 1].getRollValue() != 0)
 					{
 						takeAwayDieUse(gameTiles[dest - 1]);
@@ -572,7 +586,6 @@ public class Board {
 				}
 			}
 		}
-		//TODO: place tokens in starting spaces
 	}
 
 	private void takeAwayDieUse(Tile destinationTile) {
@@ -594,8 +607,9 @@ public class Board {
 
 	class TileIndicator implements EventHandler<MouseEvent> {
 		public void handle(MouseEvent e) {
-			System.out.println("Clicked");
+
 			Tile selectedTile = (Tile) e.getSource();
+			System.out.println(selectedTile.getTileNo() + ": Clicked");
 			if(!selectedTile.occupied) {
 				if(displayingMoves) {
 					if(selectedTile.base.getFill() == Color.RED) {
@@ -612,26 +626,45 @@ public class Board {
 					}
 					else
 					{
-						System.out.println("Nothing to do");
+						//System.out.println("Nothing to do");
 						// we're showing movement options, we clicked a non-occupied space AND a blank space
 						// we'll reset our board and act like we just clicked on our own pawn again
-						//ResetBoardAppearance();
+						ResetBoardAppearance();
 					}
 				}
 				// we clicked a tile without clicking our pawn first
 				else {
-					selectedTile.base.setFill(Color.RED);
+					ResetBoardAppearance();
 				}
 			}
 			// TODO: add an additional if statement to check to see if this is an opponent and we're showing movement options
 			else if (selectedTile.occupied){
-				System.out.println("Occupied");
+				System.out.println(selectedTile.getTileNo() + ": Occupied");
 				// storing our clicked pawn so that we can move it later
-				lastPawnClicked = selectedTile.occupier;
 				// Make sure it's our same colored pawn
-				if(selectedTile.occupier.getTokenColor() == currentPlayer.getToken(0).getTokenColor())
+
+				if(displayingMoves) {
+					if(selectedTile.base.getFill() == Color.RED) {
+						if(selectedTile.occupier.get(0).getTokenColor() == currentPlayer.getToken(0).getTokenColor())
+						{
+							lastPawnClicked = selectedTile.occupier.get(0);
+							moveToken(lastPawnClicked, selectedTile.getTileNo());
+							takeAwayDieUse(selectedTile);
+						}
+						else
+						{
+							//capture
+							moveToken(selectedTile.occupier.get(0), -1);
+							moveToken(lastPawnClicked, selectedTile.getTileNo());
+							takeAwayDieUse(selectedTile);
+						}
+					}
+				}
+
+				if(selectedTile.occupier.get(0).getTokenColor() == currentPlayer.getToken(0).getTokenColor())
 				{
-					displayMoves(currentPlayer, selectedTile.occupier.getTokenNo(), firstDieRoll, secondDieRoll);
+					lastPawnClicked = selectedTile.occupier.get(0);
+					displayMoves(currentPlayer, selectedTile.occupier.get(0), firstDieRoll, secondDieRoll);
 				}
 
 			}
@@ -649,13 +682,13 @@ public class Board {
 	}
 
 	//display spaces the selected token may move to
-	public void displayMoves(Player player, int pawn, int roll1, int roll2) {
+	public void displayMoves(Player player, Pawn pawn, int roll1, int roll2) {
 		// set all variables to reduce complexity within the method
 		ResetBoardAppearance();
 
 		displayingMoves = true;
-		lastPawnClicked = player.getToken(pawn);
-		Pawn clickedPawn = player.getToken(pawn);
+		lastPawnClicked = pawn;
+		Pawn clickedPawn = pawn;
 		int currentLocation = clickedPawn.getLocation();
 		int lastGameTileNum = player.getLastGameTileNum();
 		int midlaneTileStartNum = player.getMidlaneStartTile();
@@ -677,7 +710,8 @@ public class Board {
 					firstRollLocation = firstRollLocation - 68;
 				}
 			}
-			if (currentLocation + firstRollLocation > lastGameTileNum && currentLocation < lastGameTileNum - 12) {
+			// 32 + 38 > 68 (true) && 32 < 68 - 12
+			if (firstRollLocation > lastGameTileNum && currentLocation < lastGameTileNum - 12) {
 				firstRollSendsToMidlane = true;
 				//calculates what location should be highlighted on the individual player's midlane (colored tiles)
 				firstRollLocation = (currentLocation + firstRollLocation) - lastGameTileNum + midlaneTileStartNum;
@@ -705,7 +739,7 @@ public class Board {
 					secondRollLocation = secondRollLocation - 68;
 				}
 			}
-			if (currentLocation + secondRollLocation > lastGameTileNum && currentLocation < lastGameTileNum - 12) {
+			if (secondRollLocation > lastGameTileNum && currentLocation < lastGameTileNum - 12) {
 				secondRollSendsToMidlane = true;
 				secondRollLocation = (currentLocation + secondRollLocation) - lastGameTileNum + midlaneTileStartNum;
 			}
@@ -732,7 +766,7 @@ public class Board {
 					combinedRollLocation = combinedRollLocation - 68;
 				}
 			}
-			if (currentLocation + combinedRollLocation > lastGameTileNum && currentLocation < lastGameTileNum - 12) {
+			if (combinedRollLocation > lastGameTileNum && currentLocation < lastGameTileNum - 12) {
 				combinedRollSendsToMidlane = true;
 				combinedRollLocation = (currentLocation + combinedRollLocation) - lastGameTileNum + midlaneTileStartNum;
 			}
