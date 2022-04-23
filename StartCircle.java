@@ -10,6 +10,7 @@ public class StartCircle extends StackPane {
 	public ArrayList<Pawn> pawns;
 	private Circle[] tokens;
 	private StackPane pane;
+	private Color color;
 
 	public StartCircle() {
 		this.pawns = new ArrayList<Pawn>();
@@ -21,8 +22,11 @@ public class StartCircle extends StackPane {
 	// setter methods for the base circle
 
 	public void setStroke(Color color) {
+		this.color = color;
 		this.base.setStroke(color);
 	}
+	public void setColor(Color color) { this.color = color; }
+	public Color getColor() { return this.color; }
 
 	public void setFill(Color color) {
 		this.base.setFill(color);
@@ -63,6 +67,8 @@ public class StartCircle extends StackPane {
 	// add a pawn to start space
 	public void addPawn(Pawn pawn) {
 		this.pawns.add(pawn);
+		pawn.setLocation(-1);
+		pane.getChildren().add(pawn.token);
 		this.showPawn(pawn);
 	}
 
