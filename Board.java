@@ -693,11 +693,23 @@ public class Board {
 		int lastGameTileNum = player.getLastGameTileNum();
 		int midlaneTileStartNum = player.getMidlaneStartTile();
 		boolean firstRollSendsToMidlane = false;
+		boolean firstRollWrapsAround = false;
 		boolean secondRollSendsToMidlane = false;
+		boolean secondRollWrapsAround = false;
 		boolean combinedRollSendsToMidlane = false;
+		boolean combinedRollWrapsAround = false;
+
 		//TODO: figure out how to code this method so it displays valid spaces the player may move to
 		//TODO: Add check for blockade
 		//TODO: Call board refresh method
+		ArrayList<Integer> blockade = new ArrayList<>();
+		for(Tile t : gameTiles)
+		{
+			if(t.occupied && t.occupier.size() >= 2)
+			{
+				blockade.add(t.getTileNo());
+			}
+		}
 
 		//Naive calculation for location and then check if we overshoot our midlane
 		if(roll1 != 0)
@@ -707,6 +719,7 @@ public class Board {
 			{
 				if(firstRollLocation > 68)
 				{
+					firstRollWrapsAround = true;
 					firstRollLocation = firstRollLocation - 68;
 				}
 			}
@@ -717,15 +730,20 @@ public class Board {
 				firstRollLocation = (currentLocation + firstRollLocation) - lastGameTileNum + midlaneTileStartNum;
 			}
 			if (firstRollSendsToMidlane) {
-				//set midlane tile's color and active property
-				gameTiles[firstRollLocation - 1].base.setFill(Color.RED);
-				gameTiles[firstRollLocation - 1].active = true;
-				gameTiles[firstRollLocation - 1].setRollValue(1);
+				if (isBlockadeInTheWay(currentLocation, blockade, firstRollLocation - 1, firstRollWrapsAround) == false)
+				{
+					gameTiles[firstRollLocation - 1].base.setFill(Color.RED);
+					gameTiles[firstRollLocation - 1].active = true;
+					gameTiles[firstRollLocation - 1].setRollValue(1);
+				}
+
 			}
 			else {
-				gameTiles[firstRollLocation - 1].base.setFill(Color.RED);
-				gameTiles[firstRollLocation - 1].active = true;
-				gameTiles[firstRollLocation - 1].setRollValue(1);
+				if (isBlockadeInTheWay(currentLocation, blockade, firstRollLocation - 1, firstRollWrapsAround) == false) {
+					gameTiles[firstRollLocation - 1].base.setFill(Color.RED);
+					gameTiles[firstRollLocation - 1].active = true;
+					gameTiles[firstRollLocation - 1].setRollValue(1);
+				}
 			}
 		}
 
@@ -744,15 +762,18 @@ public class Board {
 				secondRollLocation = (currentLocation + secondRollLocation) - lastGameTileNum + midlaneTileStartNum;
 			}
 			if (secondRollSendsToMidlane) {
-				//set midlane tile's color and active property
-				gameTiles[secondRollLocation - 1].base.setFill(Color.RED);
-				gameTiles[secondRollLocation - 1].active = true;
-				gameTiles[secondRollLocation - 1].setRollValue(2);
+				if (isBlockadeInTheWay(currentLocation, blockade, secondRollLocation - 1, secondRollWrapsAround) == false) {
+					gameTiles[secondRollLocation - 1].base.setFill(Color.RED);
+					gameTiles[secondRollLocation - 1].active = true;
+					gameTiles[secondRollLocation - 1].setRollValue(2);
+				}
 			}
 			else {
-				gameTiles[secondRollLocation - 1].base.setFill(Color.RED);
-				gameTiles[secondRollLocation - 1].active = true;
-				gameTiles[secondRollLocation - 1].setRollValue(2);
+				if (isBlockadeInTheWay(currentLocation, blockade, secondRollLocation - 1, secondRollWrapsAround) == false) {
+					gameTiles[secondRollLocation - 1].base.setFill(Color.RED);
+					gameTiles[secondRollLocation - 1].active = true;
+					gameTiles[secondRollLocation - 1].setRollValue(2);
+				}
 			}
 		}
 
@@ -771,15 +792,18 @@ public class Board {
 				combinedRollLocation = (currentLocation + combinedRollLocation) - lastGameTileNum + midlaneTileStartNum;
 			}
 			if (combinedRollSendsToMidlane) {
-				//set midlane tile's color and active property
-				gameTiles[combinedRollLocation - 1].base.setFill(Color.RED);
-				gameTiles[combinedRollLocation - 1].active = true;
-				gameTiles[combinedRollLocation - 1].setRollValue(3);
+				if (isBlockadeInTheWay(currentLocation, blockade, combinedRollLocation - 1, combinedRollWrapsAround) == false) {
+					gameTiles[combinedRollLocation - 1].base.setFill(Color.RED);
+					gameTiles[combinedRollLocation - 1].active = true;
+					gameTiles[combinedRollLocation - 1].setRollValue(3);
+				}
 			}
 			else {
-				gameTiles[combinedRollLocation - 1].base.setFill(Color.RED);
-				gameTiles[combinedRollLocation - 1].active = true;
-				gameTiles[combinedRollLocation - 1].setRollValue(3);
+				if (isBlockadeInTheWay(currentLocation, blockade, combinedRollLocation - 1, combinedRollWrapsAround) == false) {
+					gameTiles[combinedRollLocation - 1].base.setFill(Color.RED);
+					gameTiles[combinedRollLocation - 1].active = true;
+					gameTiles[combinedRollLocation - 1].setRollValue(3);
+				}
 			}
 		}
 
@@ -796,4 +820,36 @@ public class Board {
 		// TODO: store the values of the valid gameTiles moves into a global array/list and the valid midlane moves into a separate array/list
 	}
 
+	private boolean isBlockadeInTheWay(int currentLocation, ArrayList<Integer> blockade, int rollLocation, boolean wrapsToStart) {
+		boolean result = false;
+		for(Integer i : blockade)
+		{
+			//if the blockade is between us and the roll location
+			if(currentLocation <= i && rollLocation >= i)
+			{
+				result = true;
+			}
+			else if(wrapsToStart)
+			{
+				if(currentLocation <= i)
+				{
+					//if we're wrapping between 68 -> 1 and the blockade is between the current location and the end
+					if(i <= 68)
+					{
+						result = true;
+					}
+				}
+				else if(currentLocation >= i)
+				{
+					//if we're wrapping between 68 -> 1 and the blockade is between the start of the gameTiles and the roll location
+					if(rollLocation >= i)
+					{
+						result = true;
+					}
+				}
+			}
+		}
+		return result;
 	}
+
+}
