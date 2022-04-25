@@ -730,7 +730,7 @@ public class Board {
 				firstRollLocation = (currentLocation + firstRollLocation) - lastGameTileNum + midlaneTileStartNum;
 			}
 			if (firstRollSendsToMidlane) {
-				if (isBlockadeInTheWay(currentLocation, blockade, firstRollLocation - 1, firstRollWrapsAround) == false)
+				if (isBlockadeInTheWay(currentLocation, blockade, firstRollLocation, firstRollWrapsAround) == false)
 				{
 					gameTiles[firstRollLocation - 1].base.setFill(Color.RED);
 					gameTiles[firstRollLocation - 1].active = true;
@@ -739,7 +739,7 @@ public class Board {
 
 			}
 			else {
-				if (isBlockadeInTheWay(currentLocation, blockade, firstRollLocation - 1, firstRollWrapsAround) == false) {
+				if (isBlockadeInTheWay(currentLocation, blockade, firstRollLocation, firstRollWrapsAround) == false) {
 					gameTiles[firstRollLocation - 1].base.setFill(Color.RED);
 					gameTiles[firstRollLocation - 1].active = true;
 					gameTiles[firstRollLocation - 1].setRollValue(1);
@@ -754,6 +754,7 @@ public class Board {
 			{
 				if(secondRollLocation > 68)
 				{
+					secondRollWrapsAround = true;
 					secondRollLocation = secondRollLocation - 68;
 				}
 			}
@@ -762,14 +763,14 @@ public class Board {
 				secondRollLocation = (currentLocation + secondRollLocation) - lastGameTileNum + midlaneTileStartNum;
 			}
 			if (secondRollSendsToMidlane) {
-				if (isBlockadeInTheWay(currentLocation, blockade, secondRollLocation - 1, secondRollWrapsAround) == false) {
+				if (isBlockadeInTheWay(currentLocation, blockade, secondRollLocation, secondRollWrapsAround) == false) {
 					gameTiles[secondRollLocation - 1].base.setFill(Color.RED);
 					gameTiles[secondRollLocation - 1].active = true;
 					gameTiles[secondRollLocation - 1].setRollValue(2);
 				}
 			}
 			else {
-				if (isBlockadeInTheWay(currentLocation, blockade, secondRollLocation - 1, secondRollWrapsAround) == false) {
+				if (isBlockadeInTheWay(currentLocation, blockade, secondRollLocation, secondRollWrapsAround) == false) {
 					gameTiles[secondRollLocation - 1].base.setFill(Color.RED);
 					gameTiles[secondRollLocation - 1].active = true;
 					gameTiles[secondRollLocation - 1].setRollValue(2);
@@ -784,6 +785,7 @@ public class Board {
 			{
 				if(combinedRollLocation > 68)
 				{
+					combinedRollWrapsAround = true;
 					combinedRollLocation = combinedRollLocation - 68;
 				}
 			}
@@ -792,14 +794,14 @@ public class Board {
 				combinedRollLocation = (currentLocation + combinedRollLocation) - lastGameTileNum + midlaneTileStartNum;
 			}
 			if (combinedRollSendsToMidlane) {
-				if (isBlockadeInTheWay(currentLocation, blockade, combinedRollLocation - 1, combinedRollWrapsAround) == false) {
+				if (isBlockadeInTheWay(currentLocation, blockade, combinedRollLocation, combinedRollWrapsAround) == false) {
 					gameTiles[combinedRollLocation - 1].base.setFill(Color.RED);
 					gameTiles[combinedRollLocation - 1].active = true;
 					gameTiles[combinedRollLocation - 1].setRollValue(3);
 				}
 			}
 			else {
-				if (isBlockadeInTheWay(currentLocation, blockade, combinedRollLocation - 1, combinedRollWrapsAround) == false) {
+				if (isBlockadeInTheWay(currentLocation, blockade, combinedRollLocation, combinedRollWrapsAround) == false) {
 					gameTiles[combinedRollLocation - 1].base.setFill(Color.RED);
 					gameTiles[combinedRollLocation - 1].active = true;
 					gameTiles[combinedRollLocation - 1].setRollValue(3);
@@ -825,13 +827,13 @@ public class Board {
 		for(Integer i : blockade)
 		{
 			//if the blockade is between us and the roll location
-			if(currentLocation <= i && rollLocation >= i)
+			if(currentLocation < i && rollLocation >= i)
 			{
 				result = true;
 			}
 			else if(wrapsToStart)
 			{
-				if(currentLocation <= i)
+				if(currentLocation < i)
 				{
 					//if we're wrapping between 68 -> 1 and the blockade is between the current location and the end
 					if(i <= 68)
@@ -839,7 +841,7 @@ public class Board {
 						result = true;
 					}
 				}
-				else if(currentLocation >= i)
+				else if(currentLocation > i)
 				{
 					//if we're wrapping between 68 -> 1 and the blockade is between the start of the gameTiles and the roll location
 					if(rollLocation >= i)
