@@ -695,8 +695,8 @@ public class Board {
 					if(selectedTile.base.getFill() == Color.RED) {
 						if(selectedTile.occupier.get(0).getTokenColor() == currentPlayer.getToken(0).getTokenColor())
 						{
-							lastPawnClicked = selectedTile.occupier.get(0);
 							moveToken(lastPawnClicked, selectedTile.getTileNo());
+							lastPawnClicked = selectedTile.occupier.get(0);
 							takeAwayDieUse(selectedTile);
 						}
 						else
@@ -778,7 +778,7 @@ public class Board {
 				firstRollLocation = (currentLocation + firstRollLocation) - lastGameTileNum + midlaneTileStartNum;
 			}
 			if (firstRollSendsToMidlane) {
-				if (isBlockadeInTheWay(currentLocation, blockade, firstRollLocation, firstRollWrapsAround) == false)
+				if (isBlockadeInTheWay(currentLocation, blockade, firstRollLocation, firstRollWrapsAround) == false && gameTiles[firstRollLocation - 1].occupier.size() < 2)
 				{
 					gameTiles[firstRollLocation - 1].base.setFill(Color.RED);
 					gameTiles[firstRollLocation - 1].active = true;
@@ -787,7 +787,7 @@ public class Board {
 
 			}
 			else {
-				if (isBlockadeInTheWay(currentLocation, blockade, firstRollLocation, firstRollWrapsAround) == false) {
+				if (isBlockadeInTheWay(currentLocation, blockade, firstRollLocation, firstRollWrapsAround) == false && gameTiles[firstRollLocation - 1].occupier.size() < 2) {
 					gameTiles[firstRollLocation - 1].base.setFill(Color.RED);
 					gameTiles[firstRollLocation - 1].active = true;
 					gameTiles[firstRollLocation - 1].setRollValue(1);
@@ -811,14 +811,14 @@ public class Board {
 				secondRollLocation = (currentLocation + secondRollLocation) - lastGameTileNum + midlaneTileStartNum;
 			}
 			if (secondRollSendsToMidlane) {
-				if (isBlockadeInTheWay(currentLocation, blockade, secondRollLocation, secondRollWrapsAround) == false) {
+				if (isBlockadeInTheWay(currentLocation, blockade, secondRollLocation, secondRollWrapsAround) == false && gameTiles[secondRollLocation - 1].occupier.size() < 2) {
 					gameTiles[secondRollLocation - 1].base.setFill(Color.RED);
 					gameTiles[secondRollLocation - 1].active = true;
 					gameTiles[secondRollLocation - 1].setRollValue(2);
 				}
 			}
 			else {
-				if (isBlockadeInTheWay(currentLocation, blockade, secondRollLocation, secondRollWrapsAround) == false) {
+				if (isBlockadeInTheWay(currentLocation, blockade, secondRollLocation, secondRollWrapsAround) == false && gameTiles[secondRollLocation - 1].occupier.size() < 2) {
 					gameTiles[secondRollLocation - 1].base.setFill(Color.RED);
 					gameTiles[secondRollLocation - 1].active = true;
 					gameTiles[secondRollLocation - 1].setRollValue(2);
@@ -842,14 +842,14 @@ public class Board {
 				combinedRollLocation = (currentLocation + combinedRollLocation) - lastGameTileNum + midlaneTileStartNum;
 			}
 			if (combinedRollSendsToMidlane) {
-				if (isBlockadeInTheWay(currentLocation, blockade, combinedRollLocation, combinedRollWrapsAround) == false) {
+				if (isBlockadeInTheWay(currentLocation, blockade, combinedRollLocation, combinedRollWrapsAround) == false && gameTiles[combinedRollLocation - 1].occupier.size() < 2) {
 					gameTiles[combinedRollLocation - 1].base.setFill(Color.RED);
 					gameTiles[combinedRollLocation - 1].active = true;
 					gameTiles[combinedRollLocation - 1].setRollValue(3);
 				}
 			}
 			else {
-				if (isBlockadeInTheWay(currentLocation, blockade, combinedRollLocation, combinedRollWrapsAround) == false) {
+				if (isBlockadeInTheWay(currentLocation, blockade, combinedRollLocation, combinedRollWrapsAround) == false && gameTiles[combinedRollLocation - 1].occupier.size() < 2) {
 					gameTiles[combinedRollLocation - 1].base.setFill(Color.RED);
 					gameTiles[combinedRollLocation - 1].active = true;
 					gameTiles[combinedRollLocation - 1].setRollValue(3);

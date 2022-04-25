@@ -1,6 +1,8 @@
 //Tile class programmed by Christopher Smith
 //Class dictates properties of the game board
 
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.layout.*;
 import javafx.scene.shape.*;
 import javafx.scene.paint.*;
@@ -105,7 +107,14 @@ public class Tile extends StackPane {
 	//place tokens on a valid space
 	public void placeToken(Pawn token) {
 		if(this.occupied) {
-			grid.add(token.token, 0, 0);
+			if(GridPane.getRowIndex(this.occupier.get(0).token) == 0 && GridPane.getColumnIndex(this.occupier.get(0).token) == 1)
+			{
+				grid.add(token.token, 0, 0);
+			}
+			else
+			{
+				grid.add(token.token, 1, 0);
+			}
 		}
 		else {
 			grid.add(token.token, 1, 0);
@@ -122,7 +131,7 @@ public class Tile extends StackPane {
 		this.occupier.remove(token);
 		if(occupier.size() == 0)
 		{
-			occupied = false;
+			this.occupied = false;
 		}
 	}
 
