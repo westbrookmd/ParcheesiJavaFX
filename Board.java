@@ -493,17 +493,65 @@ public class Board {
 				//move a token from home onto board
 
 				System.out.println("Pawn Destination: " + currentPlayer.getStartingTile());
-				moveToken(pawnInStartingArea, currentPlayer.getStartingTile());
+				if(gameTiles[currentPlayer.getStartingTile() - 1].occupied)
+				{
+					if((gameTiles[currentPlayer.getStartingTile() - 1].occupier.size() < 2))
+					{
+						if(pawnInStartingArea.getTokenColor() != gameTiles[currentPlayer.getStartingTile() - 1].occupier.get(0).getTokenColor())
+						{
+							//capture
+							moveToken(gameTiles[currentPlayer.getStartingTile() - 1].occupier.get(0), -1);
+							moveToken(pawnInStartingArea, currentPlayer.getStartingTile());
+							firstDieRoll = 0;
+						}
+						else
+						{
+							moveToken(pawnInStartingArea, currentPlayer.getStartingTile());
+							firstDieRoll = 0;
+						}
+					}
+					else
+					{
+						//already have 2 or more pawns in starting tile
+					}
+				}
+				else
+				{
+					moveToken(pawnInStartingArea, currentPlayer.getStartingTile());
+					firstDieRoll = 0;
+				}
 				System.out.println("Pawn Location: " + pawnInStartingArea.getLocation());
-				firstDieRoll = 0;
+
 			}
 			else if (secondDieRoll == 5)
 			{
 				//move a token from home onto board
 				System.out.println("Pawn Location: " + pawnInStartingArea.getLocation());
 				System.out.println("Pawn Destination: " + currentPlayer.getStartingTile());
-				moveToken(pawnInStartingArea, currentPlayer.getStartingTile());
-				secondDieRoll = 0;
+				if(gameTiles[currentPlayer.getStartingTile() - 1].occupied)
+				{
+					if((gameTiles[currentPlayer.getStartingTile() - 1].occupier.size() < 2))
+					{
+						if(pawnInStartingArea.getTokenColor() != gameTiles[currentPlayer.getStartingTile() - 1].occupier.get(0).getTokenColor())
+						{
+							//capture
+							moveToken(gameTiles[currentPlayer.getStartingTile() - 1].occupier.get(0), -1);
+							moveToken(pawnInStartingArea, currentPlayer.getStartingTile());
+							secondDieRoll = 0;
+						}
+						else
+						{
+							moveToken(pawnInStartingArea, currentPlayer.getStartingTile());
+							secondDieRoll = 0;
+						}
+					}
+				}
+				else
+				{
+					moveToken(pawnInStartingArea, currentPlayer.getStartingTile());
+					secondDieRoll = 0;
+				}
+
 			}
 		}
 		else
