@@ -20,13 +20,18 @@ public class StartCircle extends StackPane {
 	}
 
 	// setter methods for the base circle
-
 	public void setStroke(Color color) {
 		this.color = color;
 		this.base.setStroke(color);
 	}
-	public void setColor(Color color) { this.color = color; }
-	public Color getColor() { return this.color; }
+
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
+	public Color getColor() {
+		return this.color;
+	}
 
 	public void setFill(Color color) {
 		this.base.setFill(color);
@@ -81,7 +86,7 @@ public class StartCircle extends StackPane {
 
 	// remove a pawn from start
 	public void removePawn(Pawn token) {
-		int pawn = pawns.indexOf(token);
+		int pawn = pawns.size() - 1;
 		this.hidePawn(pawn);
 		this.pawns.remove(token);
 		// hidePawn(pawn);

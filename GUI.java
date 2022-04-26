@@ -17,7 +17,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
 import javafx.stage.*;
-
 import java.io.File;
 import javafx.scene.Group;
 import javafx.scene.media.AudioClip;
@@ -39,6 +38,9 @@ public class GUI extends Application {
 	private Label whoseTurn;
 	private AudioClip buzzer;
 
+	// public static void main(String[] args) {
+	// launch(args);
+	// }
 
 	public void start(Stage primaryStage) {
 		// create Borderpane to hold all components of GUI
@@ -47,7 +49,7 @@ public class GUI extends Application {
 		Die die2 = new Die();
 		board = new Board();
 		whoseTurn = new Label("");
-		buzzer = new AudioClip(getClass().getResource("/application/diceroll.wav").toExternalForm());
+		buzzer = new AudioClip(getClass().getResource("/diceroll.wav").toExternalForm());
 
 		// create the game board
 		GridPane game = board.build();
@@ -157,9 +159,7 @@ public class GUI extends Application {
 		roll.setOnMouseClicked(e -> {
 			buzzer.play();
 
-
 			System.out.println("Current Player: " + currentPlayer);
-
 
 			// roll.setDisable(true);
 
@@ -174,8 +174,7 @@ public class GUI extends Application {
 			// TODO: where do we check the rolls and do that logic?
 
 			// set first die image to show result
-			if(hasRolled)
-			{
+			if (hasRolled) {
 				currentPlayer += 1;
 			}
 			hasRolled = true;
@@ -213,11 +212,8 @@ public class GUI extends Application {
 		Scene scene = new Scene(program);
 		primaryStage.setTitle("Parcheesi Board");
 		primaryStage.setScene(scene);
-		// for some odd reason, running this in Eclipse allows the UI to display without
-		// cutting anything off, yet in jGrasp elements still get cut off, despite code
-		// in both otherwise being identical
-		// primaryStage.setWidth(1280);
-		// primaryStage.setHeight(720);
+		primaryStage.setWidth(1280);
+		primaryStage.setHeight(720);
 		primaryStage.setResizable(false);
 		primaryStage.show();
 	}
@@ -241,7 +237,7 @@ public class GUI extends Application {
 	public void ShowMovementOptions(Tile tileClicked) {
 		// TODO: Move method to Board class, or rewrite method so it relies more on the
 		// board class method
-		Pawn selectedPawn = tileClicked.occupier.get(0);
+		Pawn selectedPawn = tileClicked.occupier;
 	}
 
 	public void showCurrentPlayer() {
