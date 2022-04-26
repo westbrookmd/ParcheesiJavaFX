@@ -6,12 +6,13 @@ public class Player {
 	private Color color;
 	private int lastGameTileNumberBeforeMidlane;
 	private int midlaneStartTile;
+	private int midlaneHomeTile;
 	private int startingTile;
 
 	// @param token indicates token color, @param space indicates color of starting
 	// space and accessible midlane
 	public Player(Color token, Color space, int lastGameTileNumberBeforeMidlane, int midlaneStartTile,
-			int startingTile) {
+			int startingTile, int midlaneHomeTile) {
 		pawns = new Pawn[4];
 		for (int i = 0; i < pawns.length; i++) {
 			pawns[i] = new Pawn(i, 10, token, space);
@@ -21,6 +22,7 @@ public class Player {
 		this.color = space;
 		this.startingTile = startingTile;
 		this.midlaneStartTile = midlaneStartTile;
+		this.midlaneHomeTile = midlaneHomeTile;
 	}
 
 	public Color getColor() {
@@ -41,6 +43,7 @@ public class Player {
 	public int getMidlaneStartTile() {
 		return midlaneStartTile;
 	}
+	public int getMidlaneHomeTile() { return midlaneHomeTile; }
 
 	public int getStartingTile() {
 		return startingTile;

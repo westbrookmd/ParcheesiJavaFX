@@ -237,7 +237,7 @@ public class GUI extends Application {
 	public void ShowMovementOptions(Tile tileClicked) {
 		// TODO: Move method to Board class, or rewrite method so it relies more on the
 		// board class method
-		Pawn selectedPawn = tileClicked.occupier;
+		Pawn selectedPawn = tileClicked.occupier.get(0);
 	}
 
 	public void showCurrentPlayer() {

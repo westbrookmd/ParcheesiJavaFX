@@ -57,10 +57,10 @@ public class StartCircle extends StackPane {
 	// first-time setup for start circles; draw each pawn and position them inside
 	// circle
 	public void setupPawn(Pawn pawn) {
-		Circle token = new Circle(10);
-		positionPawn(pawn.getTokenNo(), token);
-		this.drawPawn(token, pawn.getTokenColor());
-		pane.getChildren().add(token);
+		pawn.inStartingArea = true;
+		tokens[pawn.getTokenNo()] = pawn.token;
+		this.drawPawn(pawn.token, pawn.getTokenColor());
+		positionPawn(pawn.getTokenNo(), pawn.token);
 	}
 
 	// initial setup for pawns, draw them then hide/reveal as needed
@@ -71,8 +71,11 @@ public class StartCircle extends StackPane {
 
 	// add a pawn to start space
 	public void addPawn(Pawn pawn) {
+		setupPawn(pawn);
 		this.pawns.add(pawn);
 		pawn.setLocation(-1);
+		tokens[pawn.getTokenNo()] = pawn.token;
+		pawn.inStartingArea = true;
 		pane.getChildren().add(pawn.token);
 		this.showPawn(pawn);
 	}
@@ -86,10 +89,10 @@ public class StartCircle extends StackPane {
 
 	// remove a pawn from start
 	public void removePawn(Pawn token) {
-		int pawn = pawns.size() - 1;
-		this.hidePawn(pawn);
+		token.inStartingArea = false;
 		this.pawns.remove(token);
-		// hidePawn(pawn);
+		this.tokens[token.getTokenNo()] = null;
+		dePositionPawn(token.getTokenNo(), token.token);
 	}
 
 	// hide the pawn once it leaves start
@@ -102,24 +105,29 @@ public class StartCircle extends StackPane {
 	// position pawns inside base circle
 	public void positionPawn(int x, Circle token) {
 		tokens[x] = token;
-		/*
-		 * if(x == 0) {
-		 * token.setTranslateX(-this.base.getScaleX()*25);
-		 * token.setTranslateY(-this.base.getScaleY()*25);
-		 * }
-		 * else if(x == 1) {
-		 * token.setTranslateX(+this.base.getScaleX()*25);
-		 * token.setTranslateY(-this.base.getScaleY()*25);
-		 * }
-		 * else if(x == 2) {
-		 * token.setTranslateX(-this.base.getScaleX()*25);
-		 * token.setTranslateY(+this.base.getScaleY()*25);
-		 * }
-		 * else {
-		 * token.setTranslateX(+this.base.getScaleX()*25);
-		 * token.setTranslateY(+this.base.getScaleY()*25);
-		 * }
-		 */
+
+		if(x == 0) {
+		token.setTranslateX(-this.base.getScaleX()*25);
+		token.setTranslateY(-this.base.getScaleY()*25);
+		}
+		else if(x == 1) {
+		token.setTranslateX(+this.base.getScaleX()*25);
+		token.setTranslateY(-this.base.getScaleY()*25);
+		}
+		else if(x == 2) {
+		token.setTranslateX(-this.base.getScaleX()*25);
+		token.setTranslateY(+this.base.getScaleY()*25);
+		}
+		else {
+		token.setTranslateX(+this.base.getScaleX()*25);
+		token.setTranslateY(+this.base.getScaleY()*25);
+		}
+	}
+
+	public void dePositionPawn(int x, Circle token) {
+		tokens[x] = token;
+		token.setTranslateX(0);
+		token.setTranslateY(0);
 	}
 
 	// resize pawns inside start circle
