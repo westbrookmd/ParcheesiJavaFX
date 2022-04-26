@@ -42,6 +42,7 @@ public class Board {
 	private Tile[] spaces;
 	private Tile[] midLanes;
 	protected Tile[] gameTiles;
+	protected HomeTile center;
 	protected Player[] players;
 
 	private Pawn lastPawnClicked;
@@ -97,7 +98,8 @@ public class Board {
 		}
 
 		//add home space to board
-		startLayer.add(drawHome(), 1, 1);
+		center = drawHome();
+		startLayer.add(center.getHome(), 1, 1);
 
 		//combine all the board pieces together
 		//put startLayer before cross so circles don't cover the cross with an odd window size
@@ -357,17 +359,9 @@ public class Board {
 
 	//TODO: draw the Home space	
 
-	private Rectangle drawHome() {
-		//TODO: Flesh out method; maybe create new class?
-		//draw the home space of the board
-		Rectangle center = new Rectangle();
-		//center size based on multiple of window size
-		center.setWidth(this.width * 3);
-		//center size based on multiple of window size
-		center.setHeight(this.height * 3);
-		center.setStroke(Color.RED);
-		center.setFill(Color.LIGHTBLUE);
-		center.setStrokeWidth(5);
+	private HomeTile drawHome() {
+		HomeTile center = new HomeTile(this.width * 3.05, this.height * 3.05, 10);
+		center.drawHome();
 
 		return center;
 	}
@@ -476,11 +470,11 @@ public class Board {
 						if(pawnInStartingArea.getTokenColor() != gameTiles[currentPlayer.getStartingTile() - 1].occupier.get(0).getTokenColor()) {
 							//capture
 							moveToken(gameTiles[currentPlayer.getStartingTile() - 1].occupier.get(0), -1);
-							moveToken(pawnInStartingArea, currentPlayer.getStartingTile());
+							moveToken(pawnInStartingArea, currentPlayer.getMidlaneHomeTile() - 6);
 							firstDieRoll = 0;
 						}
 						else {
-							moveToken(pawnInStartingArea, currentPlayer.getStartingTile());
+							moveToken(pawnInStartingArea, currentPlayer.getMidlaneHomeTile() - 6);
 							firstDieRoll = 0;
 						}
 					}
@@ -489,7 +483,7 @@ public class Board {
 					}
 				}
 				else {
-					moveToken(pawnInStartingArea, currentPlayer.getStartingTile());
+					moveToken(pawnInStartingArea, currentPlayer.getMidlaneHomeTile() - 6);
 					firstDieRoll = 0;
 				}
 				System.out.println("Pawn Location: " + pawnInStartingArea.getLocation());
@@ -506,17 +500,17 @@ public class Board {
 						if(pawnInStartingArea.getTokenColor() != gameTiles[currentPlayer.getStartingTile() - 1].occupier.get(0).getTokenColor()) {
 							//capture
 							moveToken(gameTiles[currentPlayer.getStartingTile() - 1].occupier.get(0), -1);
-							moveToken(pawnInStartingArea, currentPlayer.getStartingTile());
+							moveToken(pawnInStartingArea, currentPlayer.getMidlaneHomeTile() - 6);
 							secondDieRoll = 0;
 						}
 						else {
-							moveToken(pawnInStartingArea, currentPlayer.getStartingTile());
+							moveToken(pawnInStartingArea, currentPlayer.getMidlaneHomeTile() - 6);
 							secondDieRoll = 0;
 						}
 					}
 				}
 				else {
-					moveToken(pawnInStartingArea, currentPlayer.getStartingTile());
+					moveToken(pawnInStartingArea, currentPlayer.getMidlaneHomeTile() - 6);
 					secondDieRoll = 0;
 				}
 
@@ -592,11 +586,19 @@ public class Board {
 					{
 						//TODO: SEND TO HOMETILE
 						//current token is already removed, but should be sent somewhere
+						center.showPawn(currentPlayerTurn, token.getTokenNo(), token);
+						if(gameTiles[dest - 1].getRollValue() != 0)
+						{
+							takeAwayDieUse(gameTiles[dest - 1]);
+						}
 					}
-					gameTiles[dest - 1].placeToken(token);
-					if(gameTiles[dest - 1].getRollValue() != 0)
+					else
 					{
-						takeAwayDieUse(gameTiles[dest - 1]);
+						gameTiles[dest - 1].placeToken(token);
+						if(gameTiles[dest - 1].getRollValue() != 0)
+						{
+							takeAwayDieUse(gameTiles[dest - 1]);
+						}
 					}
 					ResetBoardAppearance();
 				}
