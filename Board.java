@@ -772,7 +772,7 @@ public class Board {
 				}
 			}
 			// 32 + 38 > 68 (true) && 32 < 68 - 12
-			if (firstRollLocation > lastGameTileNum && currentLocation < lastGameTileNum - 12) {
+			if (firstRollLocation > lastGameTileNum && (currentLocation >= lastGameTileNum - 12 && currentLocation <= lastGameTileNum)) {
 				firstRollSendsToMidlane = true;
 				//calculates what location should be highlighted on the individual player's midlane (colored tiles)
 				firstRollLocation = (currentLocation + firstRollLocation) - lastGameTileNum + midlaneTileStartNum;
@@ -806,7 +806,7 @@ public class Board {
 					secondRollLocation = secondRollLocation - 68;
 				}
 			}
-			if (secondRollLocation > lastGameTileNum && currentLocation < lastGameTileNum - 12) {
+			if (secondRollLocation > lastGameTileNum && (currentLocation >= lastGameTileNum - 12 && currentLocation <= lastGameTileNum)) {
 				secondRollSendsToMidlane = true;
 				secondRollLocation = (currentLocation + secondRollLocation) - lastGameTileNum + midlaneTileStartNum;
 			}
@@ -837,7 +837,7 @@ public class Board {
 					combinedRollLocation = combinedRollLocation - 68;
 				}
 			}
-			if (combinedRollLocation > lastGameTileNum && currentLocation < lastGameTileNum - 12) {
+			if (combinedRollLocation > lastGameTileNum && (currentLocation >= lastGameTileNum - 12 && currentLocation <= lastGameTileNum)) {
 				combinedRollSendsToMidlane = true;
 				combinedRollLocation = (currentLocation + combinedRollLocation) - lastGameTileNum + midlaneTileStartNum;
 			}
