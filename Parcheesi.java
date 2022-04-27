@@ -1,5 +1,3 @@
-package application;
-
 /*Parcheesi Game programmed by:
  * 		Willie Page		
  * 		Christopher Smith

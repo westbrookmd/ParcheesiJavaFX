@@ -1,5 +1,3 @@
-package application;
-
 //Class dictates properties of the tiles of the game board
 
 import javafx.scene.layout.*;

@@ -1,4 +1,4 @@
-package application;
+
 
 //Class will be used to display the main components of the game, including the game board, dice images, and buttons for controlling gameplay
 
@@ -13,6 +13,7 @@ import javafx.stage.*;
 import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.beans.property.SimpleBooleanProperty;
 
 public class GUI {
 	// integers to contain values of each die
@@ -22,7 +23,7 @@ public class GUI {
 	private boolean hasRolled;
 	private int currentPlayer;
 	private Label whoseTurn;
-	
+
 	//components for music/sound effects
 	private AudioClip buzzer;
 	private Media[] songs;
@@ -31,6 +32,10 @@ public class GUI {
 	private int trackNo = 0;
 	private MediaPlayer player;
 	private Slider volume;
+
+	SimpleBooleanProperty gameState;
+	boolean winningListenerCreated;
+	boolean winningEventCompleted;
 
 	public void start(Stage primaryStage, String[] names) {
 		// create Borderpane to hold all components of GUI
@@ -43,7 +48,7 @@ public class GUI {
 		songs = new Media[5];
 		playlist = new MediaPlayer[5];
 		singing = true;
-		
+
 		//add songs to playlist
 		songs[0] = new Media(getClass().getResource("/resources/bensound-acousticbreeze.WAV").toExternalForm());
 		songs[1] = new Media(getClass().getResource("/resources/bensound-instinct.wav").toExternalForm());
@@ -55,7 +60,7 @@ public class GUI {
 		}
 		player = playlist[trackNo];
 		player.setAutoPlay(true);
-		
+
 		// create the game board
 		GridPane game = board.build();
 		game.setAlignment(Pos.CENTER);
@@ -68,7 +73,7 @@ public class GUI {
 		diceWindow.setAlignment(Pos.CENTER);
 		diceWindow.setFillWidth(true);
 		diceWindow.setBackground(new Background(new BackgroundFill(Color.AZURE, CornerRadii.EMPTY, Insets.EMPTY)));
-		showCurrentPlayer();
+		showCurrentPlayer(names);
 		diceWindow.getChildren().add(whoseTurn);
 		diceWindow.setStyle("-fx-border-color: black;"
 				+ "-fx-border-width: 5;");
@@ -94,7 +99,7 @@ public class GUI {
 		dice.getChildren().addAll(imageView1, imageView2);
 		dice.setAlignment(Pos.CENTER);
 		diceWindow.getChildren().add(dice);
-		
+
 		//add roll button to diceWindow
 		Button roll = new Button("Roll");
 		diceWindow.getChildren().add(roll);
@@ -115,7 +120,7 @@ public class GUI {
 		player.setOnEndOfMedia(() -> {
 			nextTrack();
 		});
-		
+
 		musicBox.getChildren().addAll(musicLabel, playMusic, nextTrack, prevTrack, volLabel, volume);
 		musicBox.setAlignment(Pos.CENTER);
 		musicBox.setStyle("-fx-border-color: black;"
@@ -147,7 +152,7 @@ public class GUI {
 		exit.setOnAction(e -> {
 			System.exit(0);
 		});
-		
+
 		about.setOnAction(e -> {
 			Stage stage = new Stage();
 			StackPane pane = new StackPane();
@@ -166,7 +171,7 @@ public class GUI {
 			stage.setResizable(false);
 			stage.show();
 		});
-		
+
 		rules.setOnAction(e -> {
 			Rules rulesPage = new Rules();
 			rulesPage.handle(e);
@@ -175,7 +180,7 @@ public class GUI {
 		// set up event handlers for buttons
 		roll.setOnMouseClicked(e -> {
 			buzzer.play();
-			
+
 			firstDieRoll = die1.roll();
 			board.firstDieRoll = firstDieRoll;
 			secondDieRoll = die2.roll();
@@ -190,11 +195,40 @@ public class GUI {
 			if (currentPlayer == 4) {
 				currentPlayer = 0;
 			}
-			showCurrentPlayer();
 			board.currentPlayerTurn = currentPlayer;
 			board.rollUpdate();
+			gameState = board.center.gameover;
+			if(gameState != null && !winningListenerCreated)
+			{
+				gameState.addListener((observable, oldValue, newValue) ->{
+					if (newValue)
+					{
+						if(!winningEventCompleted)
+						{
+							//end logic
+							Stage stage = new Stage();
+							BorderPane pane = new BorderPane();
+							Scene scene = new Scene(pane);
+							stage.setScene(scene);
+							Text winner = new Text(names[currentPlayer]+ " wins!");
+							winner.setWrappingWidth(75);
+							pane.setCenter(winner);
+							BorderPane.setAlignment(winner, Pos.CENTER);
+							stage.setWidth(100);
+							stage.setHeight(100);
+							stage.setResizable(false);
+							stage.show();
+							stage.setOnCloseRequest(minievent -> {
+								System.exit(0);
+							});
+						}
+						winningEventCompleted = true;
+					}
+				});
+			}
+			showCurrentPlayer(names);
 		});
-		
+
 		playMusic.setOnAction(e -> {
 			if(singing) {
 				player.pause();
@@ -207,11 +241,11 @@ public class GUI {
 				singing = true;
 			}
 		});
-		
+
 		nextTrack.setOnAction(e -> {
 			nextTrack();
 		});
-		
+
 		prevTrack.setOnAction(e -> {
 			prevTrack();
 		});
@@ -238,8 +272,8 @@ public class GUI {
 		primaryStage.show();
 	}
 
-	public void showCurrentPlayer() {
-		String message = "It is Player " + (this.currentPlayer + 1) + "'s turn.";
+	public void showCurrentPlayer(String[] names) {
+		String message = "It is " + names[this.currentPlayer] + "'s turn.";
 		whoseTurn.setText(message);
 	}
 
@@ -260,10 +294,10 @@ public class GUI {
 			nextTrack();
 		});
 	}
-	
+
 	public void prevTrack() {
 		player.stop();
-		
+
 		if(trackNo == 0) {
 			trackNo = playlist.length;
 		}

@@ -1,5 +1,4 @@
-package application;
-
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Pos;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -10,6 +9,7 @@ public class HomeTile {
 	private Rectangle base;
 	private StackPane pane;
 	private Circle[][] circles;
+	SimpleBooleanProperty gameover;
 
 	public HomeTile(double width, double height, double radius) {
 		this.base = new Rectangle(width, height);
@@ -20,6 +20,7 @@ public class HomeTile {
 				circles[i][j] = new Circle(radius);
 			}
 		}
+		this.gameover = new SimpleBooleanProperty();
 	}
 
 	public void drawHome() {
@@ -73,7 +74,7 @@ public class HomeTile {
 		for(int i = 0; i < circles[0].length; i ++) {
 			pawns.getChildren().add(circles[0][i]);
 			circles[0][i].setCenterY(centerY - 25);
-			circles[0][i].setFill(Color.PURPLE);
+			circles[0][i].setFill(Color.TRANSPARENT);
 			switch(i) {
 			case 0:
 				circles[0][i].setCenterX(centerX - 35);
@@ -91,7 +92,7 @@ public class HomeTile {
 		for(int i = 0; i < circles[1].length; i ++) {
 			pawns.getChildren().add(circles[1][i]);
 			circles[1][i].setCenterX(centerX - 60);
-			circles[1][i].setFill(Color.GREEN);
+			circles[1][i].setFill(Color.TRANSPARENT);
 			switch(i) {
 			case 0:
 				circles[1][i].setCenterY(centerY - 25);
@@ -109,7 +110,7 @@ public class HomeTile {
 		for(int i = 0; i < circles[2].length; i ++) {
 			pawns.getChildren().add(circles[2][i]);
 			circles[2][i].setCenterY(centerY + 25);
-			circles[2][i].setFill(Color.ORANGE);
+			circles[2][i].setFill(Color.TRANSPARENT);
 			switch(i) {
 			case 0:
 				circles[2][i].setCenterX(centerX - 35);
@@ -127,7 +128,7 @@ public class HomeTile {
 		for(int i = 0; i < circles[3].length; i ++) {
 			pawns.getChildren().add(circles[3][i]);
 			circles[3][i].setCenterX(centerX + 60);
-			circles[3][i].setFill(Color.YELLOW);
+			circles[3][i].setFill(Color.TRANSPARENT);
 			switch(i) {
 			case 0:
 				circles[3][i].setCenterY(centerY - 25);
@@ -145,7 +146,14 @@ public class HomeTile {
 
 	//reveal circles as pawns enter home, @param tokenNo used to prevent logic errors resulting from using pawn.getTokenNo()
 	public void showPawn(int player, int tokenNo, Pawn pawn) {
-		circles[player][tokenNo].setStroke(Color.BLACK);
-		circles[player][tokenNo].setFill(pawn.getTokenColor());
+		if(tokenNo < circles[player].length)
+		{
+			circles[player][tokenNo].setStroke(Color.BLACK);
+			circles[player][tokenNo].setFill(pawn.getTokenColor());
+		}
+		else
+		{
+			gameover.set(true);
+		}
 	}
 }

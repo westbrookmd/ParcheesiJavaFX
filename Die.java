@@ -1,5 +1,3 @@
-package application;
-
 import javafx.scene.image.Image;
 
 public class Die {

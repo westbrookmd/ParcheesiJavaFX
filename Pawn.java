@@ -1,5 +1,3 @@
-package application;
-
 import javafx.scene.shape.*;
 import javafx.scene.paint.*;
 

@@ -1,5 +1,3 @@
-package application;
-
 import javafx.event.EventHandler;
 import javafx.geometry.*;
 import javafx.scene.*;
@@ -35,6 +33,7 @@ public class Board {
 	private GridPane startLayer;
 	private GridPane cross;
 	private GridPane game;
+	protected HomeTile center;
 
 	//create and initialize arrays for each space and for player tokens
 	//create separate array to hold only the tiles that are actually seen by the player
@@ -96,7 +95,8 @@ public class Board {
 		}
 
 		//add home space to board
-		startLayer.add(drawHome(), 1, 1);
+		center = drawHome();
+		startLayer.add(center.getHome(), 1, 1);
 
 		//combine all the board pieces together
 		//put startLayer before cross so circles don't cover the cross with an odd window size
@@ -153,7 +153,6 @@ public class Board {
 				}
 			}
 		}
-
 		return cross;
 	}
 
@@ -344,17 +343,16 @@ public class Board {
 				gameTiles[i].setIsSafe(true);
 			}
 		}
-
 		for (Tile t : gameTiles) {
 			t.setOnMouseClicked(new TileIndicator());
 		}
 	}	
 
-	private Pane drawHome() {
+	private HomeTile drawHome() {
 		//draw the home space of the board
 		HomeTile center = new HomeTile(this.width * 3.05, this.height * 3.05, 10);
 		center.drawHome();
-		return center.getHome();
+		return center;
 	}
 
 	private void drawStartSpaces(GridPane startLayer) {
@@ -428,8 +426,6 @@ public class Board {
 		for (int i = 0; i < startSpaces.length; i++) {
 			startSpaces[i].setRadius(radius);
 		}
-
-		//resize pawns
 	}
 
 	public void rollUpdate()
@@ -465,7 +461,6 @@ public class Board {
 					moveToken(pawnInStartingArea, currentPlayer.getStartingTile());
 					firstDieRoll = 0;
 				}
-
 			}
 			else if (secondDieRoll == 5) {
 				//move a token from home onto board
@@ -501,7 +496,6 @@ public class Board {
 
 	//move tokens around the board
 	//@param token indicates which token must be moved, dest represents tileNo for destination tile
-	
 	public void moveToken(Pawn token, int dest) {
 		//token is currently at starting circle
 		int currentLocation = token.getLocation();
@@ -559,13 +553,25 @@ public class Board {
 				else {
 					if(dest == midlaneHomeTile)
 					{
-						//TODO: SEND TO HOMETILE
 						//current token is already removed, but should be sent somewhere
+						spaces[0].placeToken(token);
+						token.token.setFill(Color.TRANSPARENT);
+						token.token.setStroke(Color.TRANSPARENT);
+						currentPlayer.finishToken(token);
+
+						center.showPawn(currentPlayerTurn, currentPlayer.atHome(), token);
+						if(gameTiles[dest - 1].getRollValue() != 0)
+						{
+							takeAwayDieUse(gameTiles[dest - 1]);
+						}
 					}
-					gameTiles[dest - 1].placeToken(token);
-					if(gameTiles[dest - 1].getRollValue() != 0)
+					else
 					{
-						takeAwayDieUse(gameTiles[dest - 1]);
+						gameTiles[dest - 1].placeToken(token);
+						if(gameTiles[dest - 1].getRollValue() != 0)
+						{
+							takeAwayDieUse(gameTiles[dest - 1]);
+						}
 					}
 					ResetBoardAppearance();
 				}
@@ -573,7 +579,6 @@ public class Board {
 		}
 	}
 
-	
 	private void takeAwayDieUse(Tile destinationTile) {
 		int rollValue = destinationTile.getRollValue();
 		if(rollValue == 1)
@@ -591,7 +596,6 @@ public class Board {
 		}
 	}
 
-	
 	class TileIndicator implements EventHandler<MouseEvent> {
 		public void handle(MouseEvent e) {
 
@@ -651,7 +655,6 @@ public class Board {
 		}
 	}
 
-	
 	public void ResetBoardAppearance()
 	{
 		for(Tile t : gameTiles)
@@ -663,7 +666,6 @@ public class Board {
 	}
 
 	//display spaces the selected token may move to
-	
 	public void displayMoves(Player player, Pawn pawn, int roll1, int roll2) {
 		// set all variables to reduce complexity within the method
 		ResetBoardAppearance();
@@ -705,7 +707,7 @@ public class Board {
 				firstRollLocation = midlaneLocation;
 			}
 			if(blockadeNotInTheWay(currentLocation, blockade, firstRollLocation, firstRollWrapsAround)) {
-				if(firstRollLocation < gameTiles.length) {
+				if(firstRollLocation - 1 < gameTiles.length) {
 					Tile destination = gameTiles[firstRollLocation - 1];
 					if (destination.occupier.size() < 2 && firstRollLocation <= midlaneHomeTile) {
 						if(destination.occupied && destination.getIsSafe() && destination.occupier.get(0).getTokenColor() != player.getToken(0).getTokenColor())
@@ -788,7 +790,6 @@ public class Board {
 		}
 	}
 
-	
 	private boolean blockadeNotInTheWay(int currentLocation, ArrayList<Integer> blockade, int rollLocation, boolean wrapsToStart) {
 		boolean result = false;
 		for(Integer i : blockade)
@@ -820,7 +821,6 @@ public class Board {
 		}
 		return !result;
 	}
-
 	
 	public void namePlayers(String[] names) {
 		for(int i = 0; i < this.playerNames.length; i++) {

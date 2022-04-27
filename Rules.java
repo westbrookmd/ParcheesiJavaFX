@@ -1,5 +1,3 @@
-package application;
-
 import javafx.event.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
