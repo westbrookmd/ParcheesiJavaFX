@@ -586,7 +586,12 @@ public class Board {
 					{
 						//TODO: SEND TO HOMETILE
 						//current token is already removed, but should be sent somewhere
-						center.showPawn(currentPlayerTurn, token.getTokenNo(), token);
+						spaces[0].placeToken(token);
+						token.token.setFill(Color.TRANSPARENT);
+						token.token.setStroke(Color.TRANSPARENT);
+						currentPlayer.finishToken(token);
+
+						center.showPawn(currentPlayerTurn, currentPlayer.atHome(), token);
 						if(gameTiles[dest - 1].getRollValue() != 0)
 						{
 							takeAwayDieUse(gameTiles[dest - 1]);
@@ -737,7 +742,7 @@ public class Board {
 				firstRollLocation = midlaneLocation;
 			}
 			if(blockadeNotInTheWay(currentLocation, blockade, firstRollLocation, firstRollWrapsAround)) {
-				if(firstRollLocation < gameTiles.length) {
+				if(firstRollLocation - 1 < gameTiles.length) {
 					Tile destination = gameTiles[firstRollLocation - 1];
 					if (destination.occupier.size() < 2 && firstRollLocation <= midlaneHomeTile) {
 						if(destination.occupied && destination.getIsSafe() && destination.occupier.get(0).getTokenColor() != player.getToken(0).getTokenColor())

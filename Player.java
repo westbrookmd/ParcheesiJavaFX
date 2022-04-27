@@ -1,8 +1,11 @@
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
+
 public class Player {
 	// initialize array of tokens for each player
 	protected Pawn[] pawns;
+	private ArrayList<Pawn> finishedPawns;
 	private Color color;
 	private int lastGameTileNumberBeforeMidlane;
 	private int midlaneStartTile;
@@ -23,6 +26,7 @@ public class Player {
 		this.startingTile = startingTile;
 		this.midlaneStartTile = midlaneStartTile;
 		this.midlaneHomeTile = midlaneHomeTile;
+		this.finishedPawns = new ArrayList<Pawn>();
 	}
 
 	public Color getColor() {
@@ -54,5 +58,12 @@ public class Player {
 		Pawn selected = this.getToken(token);
 		start.removeToken(selected);
 		dest.placeToken(selected);
+	}
+
+	public void finishToken(Pawn pawn) {
+		finishedPawns.add(pawn);
+	}
+	public int atHome() {
+		return finishedPawns.size() - 1;
 	}
 }

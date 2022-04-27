@@ -1,3 +1,4 @@
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Pos;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -9,6 +10,7 @@ public class HomeTile {
 	private StackPane pane;
 	private Circle[][] circles;
 	private Pane pawns;
+	SimpleBooleanProperty gameover;
 
 	public HomeTile(double width, double height, double radius) {
 		this.base = new Rectangle(width, height);
@@ -19,6 +21,7 @@ public class HomeTile {
 				circles[i][j] = new Circle(radius);
 			}
 		}
+		this.gameover = new SimpleBooleanProperty();
 	}
 
 	public void drawHome() {
@@ -145,18 +148,15 @@ public class HomeTile {
 
 	//reveal circles as pawns enter home, @param tokenNo used to prevent logic errors resulting from using pawn.getTokenNo()
 	public void showPawn(int player, int tokenNo, Pawn pawn) {
-		player -= 1;
-		pawn.token.setTranslateX(circles[player][tokenNo].getTranslateX());
-		pawn.token.setTranslateY(circles[player][tokenNo].getTranslateY());
-		pawn.token.setCenterX(circles[player][tokenNo].getCenterX());
-		pawn.token.setCenterY(circles[player][tokenNo].getCenterY());
-
-		int index = pawns.getChildren().indexOf((circles[player][tokenNo]));
-		pawns.getChildren().remove(index);
-		circles[player][tokenNo] = pawn.token;
-		circles[player][tokenNo].setStroke(Color.BLACK);
-		circles[player][tokenNo].setFill(pawn.getTokenColor());
-		pawns.getChildren().add(index, circles[player][tokenNo]);
+		if(tokenNo < circles[player].length)
+		{
+			circles[player][tokenNo].setStroke(Color.BLACK);
+			circles[player][tokenNo].setFill(pawn.getTokenColor());
+		}
+		else
+		{
+			gameover.set(true);
+		}
 
 	}
 }

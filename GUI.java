@@ -8,6 +8,13 @@
  *  Write a resize method to resize all components of the GUI
  */
 import javafx.application.*;
+import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.*;
 import javafx.geometry.*;
 import javafx.scene.*;
@@ -37,6 +44,9 @@ public class GUI extends Application {
 	private int currentPlayer;
 	private Label whoseTurn;
 	private AudioClip buzzer;
+	SimpleBooleanProperty gameState;
+	boolean winningListenerCreated;
+	boolean winningEventCompleted;
 
 	// public static void main(String[] args) {
 	// launch(args);
@@ -184,12 +194,32 @@ public class GUI extends Application {
 			showCurrentPlayer();
 			board.currentPlayerTurn = currentPlayer;
 			board.rollUpdate();
+			gameState = board.center.gameover;
+			if(gameState != null && !winningListenerCreated)
+			{
+				gameState.addListener((observable, oldValue, newValue) ->{
+					if (newValue)
+					{
+						if(!winningEventCompleted)
+						{
+							//end logic
+							System.out.println("The winner is " + currentPlayer);
+						}
+						winningEventCompleted = true;
+					}
+				});
+			}
 		});
 
 		rules.setOnMouseClicked(e -> {
 			// TODO: Display new window for rules page(s)
 
 		});
+
+		//https://docs.oracle.com/javafx/2/binding/jfxpub-binding.htm
+
+
+
 
 		// set components inside GUI borderbox
 		// TODO: set something on the left side to center the game board?
