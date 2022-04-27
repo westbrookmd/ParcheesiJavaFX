@@ -3,26 +3,27 @@
  * 		Christopher Smith
  * 		Marshall Westbrook
  * 		Natalie Young
- * Final Exam Prototype I
- * CPT 237
- * March 8, 2022
  */
 
 
 import javafx.application.*;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Parcheesi extends Application {
-	
+
+	public static void main(String[] args) {
+		launch(args);
+	}
+
+	@Override
 	public void start(Stage primaryStage) {
-		 GUI gui = new GUI();
-		 gui.start(primaryStage);
-	    primaryStage.setTitle("Parcheesi");
-	    primaryStage.setWidth(1280);
-	    primaryStage.setHeight(720);
-	    primaryStage.setResizable(false);
-	    primaryStage.show();
+		GUI gui = new GUI();
+		TitleScreen title = new TitleScreen();
+		primaryStage.setTitle("Parcheesi");
+		primaryStage.setScene(title.setScreen(primaryStage, gui));
+		primaryStage.setWidth(1280);
+		primaryStage.setHeight(720);
+		primaryStage.setResizable(false);
+		primaryStage.show();
 	}
 }

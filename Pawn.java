@@ -1,5 +1,3 @@
-//Pawn class programmed by Christopher Smith
-
 import javafx.scene.shape.*;
 import javafx.scene.paint.*;
 

@@ -1,6 +1,4 @@
 import java.util.ArrayList;
-
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -10,6 +8,7 @@ public class StartCircle extends StackPane {
 	public ArrayList<Pawn> pawns;
 	private Circle[] tokens;
 	private StackPane pane;
+	private Color color;
 
 	public StartCircle() {
 		this.pawns = new ArrayList<Pawn>();
@@ -17,11 +16,18 @@ public class StartCircle extends StackPane {
 		this.pane = new StackPane();
 		this.tokens = new Circle[4];
 	}
-
-	// setter methods for the base circle
-
+	
 	public void setStroke(Color color) {
+		this.color = color;
 		this.base.setStroke(color);
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
+	public Color getColor() {
+		return this.color;
 	}
 
 	public void setFill(Color color) {
@@ -45,13 +51,12 @@ public class StartCircle extends StackPane {
 		this.pane.getChildren().add(base);
 	}
 
-	// first-time setup for start circles; draw each pawn and position them inside
-	// circle
+	// first-time setup for start circles; draw each pawn and position them inside circle
 	public void setupPawn(Pawn pawn) {
-		Circle token = new Circle(10);
-		positionPawn(pawn.getTokenNo(), token);
-		this.drawPawn(token, pawn.getTokenColor());
-		pane.getChildren().add(token);
+		pawn.inStartingArea = true;
+		tokens[pawn.getTokenNo()] = pawn.token;
+		this.drawPawn(pawn.token, pawn.getTokenColor());
+		positionPawn(pawn.getTokenNo(), pawn.token);
 	}
 
 	// initial setup for pawns, draw them then hide/reveal as needed
@@ -62,7 +67,12 @@ public class StartCircle extends StackPane {
 
 	// add a pawn to start space
 	public void addPawn(Pawn pawn) {
+		setupPawn(pawn);
 		this.pawns.add(pawn);
+		pawn.setLocation(-1);
+		tokens[pawn.getTokenNo()] = pawn.token;
+		pawn.inStartingArea = true;
+		pane.getChildren().add(pawn.token);
 		this.showPawn(pawn);
 	}
 
@@ -75,10 +85,10 @@ public class StartCircle extends StackPane {
 
 	// remove a pawn from start
 	public void removePawn(Pawn token) {
-		int pawn = pawns.indexOf(token);
-		this.hidePawn(pawn);
+		token.inStartingArea = false;
 		this.pawns.remove(token);
-		// hidePawn(pawn);
+		this.tokens[token.getTokenNo()] = null;
+		dePositionPawn(token.getTokenNo(), token.token);
 	}
 
 	// hide the pawn once it leaves start
@@ -91,24 +101,29 @@ public class StartCircle extends StackPane {
 	// position pawns inside base circle
 	public void positionPawn(int x, Circle token) {
 		tokens[x] = token;
-		/*
-		 * if(x == 0) {
-		 * token.setTranslateX(-this.base.getScaleX()*25);
-		 * token.setTranslateY(-this.base.getScaleY()*25);
-		 * }
-		 * else if(x == 1) {
-		 * token.setTranslateX(+this.base.getScaleX()*25);
-		 * token.setTranslateY(-this.base.getScaleY()*25);
-		 * }
-		 * else if(x == 2) {
-		 * token.setTranslateX(-this.base.getScaleX()*25);
-		 * token.setTranslateY(+this.base.getScaleY()*25);
-		 * }
-		 * else {
-		 * token.setTranslateX(+this.base.getScaleX()*25);
-		 * token.setTranslateY(+this.base.getScaleY()*25);
-		 * }
-		 */
+
+		if(x == 0) {
+		token.setTranslateX(-this.base.getScaleX()*25);
+		token.setTranslateY(-this.base.getScaleY()*25);
+		}
+		else if(x == 1) {
+		token.setTranslateX(+this.base.getScaleX()*25);
+		token.setTranslateY(-this.base.getScaleY()*25);
+		}
+		else if(x == 2) {
+		token.setTranslateX(-this.base.getScaleX()*25);
+		token.setTranslateY(+this.base.getScaleY()*25);
+		}
+		else {
+		token.setTranslateX(+this.base.getScaleX()*25);
+		token.setTranslateY(+this.base.getScaleY()*25);
+		}
+	}
+
+	public void dePositionPawn(int x, Circle token) {
+		tokens[x] = token;
+		token.setTranslateX(0);
+		token.setTranslateY(0);
 	}
 
 	// resize pawns inside start circle

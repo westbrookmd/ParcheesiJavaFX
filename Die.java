@@ -1,7 +1,5 @@
 import javafx.scene.image.Image;
 
-//Natalie Young
-
 public class Die {
 	//Data Fields
 	private int top;
@@ -9,7 +7,7 @@ public class Die {
 
 	//Constructor
 	public Die(){
-		top = 5;
+		top = 6;
 		dieImages = new Image[6];
 		for(int i = 0; i < dieImages.length; i++) {
 			dieImages[i] = new Image(imagePath(i));
@@ -17,7 +15,7 @@ public class Die {
 	}
 	
 	private String imagePath(int i) {
-		return "dice" + (i + 1) + ".png";
+		return "/resources/dice" + (i + 1) + ".png";
 	}
 
 	public int getTop(){
@@ -31,7 +29,7 @@ public class Die {
 	}
 	
 	public Image showDie() {
-		return dieImages[top];
+		return dieImages[top - 1];
 	}
 
 	//test the die rolling method
